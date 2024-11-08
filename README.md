@@ -1,4 +1,4 @@
-<img alt="CS Club Logo" src="images/logo-transparent.png" align="right" width="150px"/>
+<img alt="i2i logo" src="images/i2i-logo.png" align="right" width="150px"/>
 
 # Ideas 2 Innovation: Official Website
 
