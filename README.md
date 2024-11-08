@@ -1,8 +1,8 @@
 <img alt="CS Club Logo" src="images/logo-transparent.png" align="right" width="150px"/>
 
-# CS Club Website
+# Ideas 2 Innovation: Official Website
 
-Welcome to the repository of GSMST CS Club's website!
+Welcome to the repository of Ideas 2 Innovation website!
 
 ## Directory Structure
 
