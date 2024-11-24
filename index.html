@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>i2i Amherst Venture Accelerator</title>
   <!-- Favicon -->
-  <link rel="icon" href="images/logo-transparent.png">
+  <link rel="icon" href="images/i2iLogoFinalWhiteBG.png">
   <!-- AOS CSS -->
   <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css">
   <!-- Global styles -->
@@ -15,11 +15,10 @@
 
   <header class="header">
     <a href="/" class="logo">
-      <img class="logo-img" src="images/logo-transparent.png" alt="i2i Logo">
-      <div class="logo-text">i2i<br>Ideas to Innovation</div>
+      <img class="logo-img" src="images/i2iLogoTextOrange.png" alt="i2i Logo">
     </a>
     <nav>
-      <ul>
+      <ul class="nav-links">
         <li><a href="./our-team.html" class="nav-link line-hover">Our Team</a></li>
         <li><a href="./startups.html" class="nav-link line-hover">Startups</a></li>
         <li><a href="./events.html" class="nav-link line-hover">Events</a></li>
@@ -35,31 +34,39 @@
 
   <main id="vanta-bg" class="main-content">
     <section class="hero">
-      <div class="left" data-aos="fade-right">
+      <div class="hero-text" data-aos="fade-right">
         <h1 class="hero-title">We are i2i, Amherst’s student-led venture accelerator</h1>
         <p class="hero-description">
           We help launch and scale student ideas. Our mission is to apply Amherst’s rigorous academic learnings to generate solutions for real-world problems.
         </p>
-        <p class="hero-link">
-          Follow us on <a href="https://instagram.com/i2i.amherst" target="_blank">Instagram</a> and join our <a href="#newsletter">newsletter</a> for updates.
-        </p>
-      </div>
-      <div class="right">
-        <img src="images/i2i-logo.png" class="panel-img" alt="i2i logo" />
+        <div class="button-group">
+          <a href="https://instagram.com/i2i.amherst" target="_blank" id="instagram-btn" class="button">
+            Follow us on Instagram
+          </a>
+          <a href="#newsletter" id="newsletter-btn" class="button">
+            Join our newsletter
+          </a>
+        </div>
       </div>
     </section>
 
-    <section id="info-sections" class="info-sections" data-aos="fade-up">
-      <div class="card" id="startups">
-        <h2>Startups</h2>
-        <p>Shower thought or grand plan, i2i delivers resources, people, and advice to motivated founders.</p>
-        <a href="#learn-more">Learn more →</a>
-      </div>
-      <div class="card" id="our-team">
-        <h2>Our Team</h2>
-        <p>i2i offers real-world project and work experience to students looking for an exciting community.</p>
-        <a href="#learn-more">Learn more →</a>
-      </div>
+    <section id="index-info" class="info-sections">
+        <div class="index-card" id="startups">
+          <img src="../images/startups-cover.jpg" alt="Startups Cover Image">
+          <div>
+            <h2>Startups</h2>
+            <p>Shower thought or grand plan, i2i delivers resources, people, and advice to motivated founders.</p>
+            <a href="#learn-more">Learn more →</a>
+          </div>
+        </div>
+        <div class="index-card" id="our-team">
+          <img src="../images/team-cover.jpg" alt="Our Team Cover Image">
+          <div>
+            <h2>Our Team</h2>
+            <p>i2i offers real-world project and work experience to students looking for an exciting community.</p>
+            <a href="#learn-more">Learn more →</a>
+          </div>
+        </div>
     </section>
     <footer class="footer">
       <p>© 2024 i2i Amherst Venture Accelerator. All rights reserved.</p>

@@ -1,3 +1,18 @@
+// Customize navbar on scroll
+const header = document.querySelector(".header");
+const navLinks = document.querySelector(".nav-links");
+const main = document.querySelector("main"); // Change this to your scrollable element
+
+main.addEventListener("scroll", () => {
+  if (main.scrollTop > 50) {
+    header.classList.add("header-scrolled");
+    navLinks.classList.add("nav-links-scrolled");
+  } else {
+    header.classList.remove("header-scrolled");
+    navLinks.classList.remove("nav-links-scrolled");
+  }
+});
+
 // Handle mobile navbar state
 const toggleBtn = document.querySelector(".toggle-btn");
 const navList = document.querySelector("nav > ul");
