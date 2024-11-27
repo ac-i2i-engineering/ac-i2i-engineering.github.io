@@ -39,10 +39,6 @@ main {
 }
 
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 60px;
   transition: all 0.4s;
 }
 
@@ -52,10 +48,9 @@ header {
 }
 
 .logo {
-  display: flex;
-  align-items: center;
   color: black;
   text-decoration: none;
+  margin-right: auto;
 }
 
 .logo-img {
@@ -68,35 +63,47 @@ header {
   font-weight: 600;
 }
 
-.nav-links {
+/* Add a black background color to the top navigation */
+.navbar {
   display: flex;
-  background: #fff;
-  margin: 0;
-  padding: 18px 10px;
-  border-radius: 12px;
-  box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-  transition: all 0.2s;
+  align-items: center;
+  width: 100%;
+  background-color: transparent;
+  overflow: hidden;
+  padding: 5px 40px 0 20px;
 }
 
-.nav-links-scrolled {
-  background: transparent;
-  box-shadow: none;
+/* Style the links inside the navigation bar */
+.navbar a {
+  color: #333;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
 }
 
-.nav-links li {
-  list-style: none;
-  margin: 0 12px;
+/* Change the color of links on hover */
+.navbar a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* Add an active class to highlight the current page */
+.navbar a.active {
+  background-color: #04AA6D;
+  color: white;
+}
+
+/* Hide the link that should open and close the navbar on small screens */
+.navbar .icon {
+  display: none;
 }
 
 .nav-link {
   color: #333;
   font-size: 1rem;
-  margin: 0 10px;
+  margin: 0 15px;
   text-decoration: none;
-}
-
-.toggle-btn {
-  display: none;
 }
 
 .main-content {
@@ -168,10 +175,6 @@ header {
   background-color: #F5D5B5;
 }
 
-.panel-img {
-  max-width: 300px;
-}
-
 .info-sections {
   margin: 100px 10%;
   padding: 50px;
@@ -218,15 +221,14 @@ header {
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 2rem;
-  margin: 0 auto;
+  margin: 40px auto 0 auto;
   max-width: 1200px;
-  padding: 2rem;
 }
 
 .team-card {
   flex: 0 1 calc(50% - 2rem);
   margin-bottom: 40px;
-  padding: 30px 60px;
+  padding: 2.5% 5%;
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 10px;
   box-shadow: 0 5px 10px rgba(0,0,0,0.2);
@@ -295,8 +297,12 @@ a {
 
 /* Horizontal breakpoint for tablets (1024px and under) */
 @media (max-width: 1024px) {
+  .navbar {
+    padding: 14px 5px;
+  }
+
   .hero-title {
-    font-size: clamp(24px, 3vw, 36px);
+    font-size: clamp(24px, 3.2vw, 36px);
   }
   
   .hero-description {
@@ -306,12 +312,59 @@ a {
   .button {
     font-size: clamp(16px, 1vw, 24px);
   }
+
+  .info-sections {
+    flex-direction: column;
+    align-items: center;
+    margin: 60px 5%;
+  }
+
+  .index-card {
+    margin-bottom: 60px;
+  }
+
+  #team-cards {
+    gap: 1rem;
+  }
+
+  .team-card {
+    flex: 0 1 calc(50% - 1rem);
+    min-width: unset;
+  }
 }
 
 /* Vertical breakpoint for tablets (768px and under) */
 @media (max-width: 768px) {
-  .nav-links {
+  .navbar {
+    padding: 5px 20px 10px 20px;
+    background-color: white;
+  }
+  
+  .navbar a:not(:first-child) {
     display: none;
+  }
+  
+  .navbar a.icon {
+    float: right;
+    display: block;
+  }
+
+  .navbar.responsive {
+    position: relative;
+    display: block;
+  }
+
+  .navbar.responsive a.icon {
+    position: absolute;
+    right: 20px;
+    top: 17px;
+  }
+
+  .navbar.responsive a {
+    float: none;
+    display: block;
+    margin: 0;
+    text-align: left;
   }
 
   .hero {
@@ -322,19 +375,23 @@ a {
   }
 
   .hero-text {
+    position: relative;
+    top: 50px;
     width: 100%;
     max-width: 100%;
   }
 
   .hero-title {
-    font-size: clamp(24px, 5vw, 36px);
+    font-size: clamp(24px, 8vw, 36px);
     padding: 0 20px;
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
   
   .hero-description {
-    font-size: clamp(18px, 1.4vw, 36px);
+    width: 90%;
+    min-width: unset;
+    font-size: 18px;
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
@@ -346,30 +403,31 @@ a {
   
   .button {
     width: 300px;
-    font-size: clamp(16px, 1.2vw, 24px);
-  }
-
-  .panel-img {
-    margin-top: 2rem;
+    font-size: 16px;
   }
 
   .info-sections {
+    padding: 0;
+    margin: 60px 40px 0 40px;
+  }
+
+  .index-card {
+    width: 100%;
+  }
+
+  #team-cards {
     flex-direction: column;
     align-items: center;
   }
 
-  .index-card {
-    margin: 0 20px;
-  }
-
   .team-card {
-    width: 90%;
-    flex: 1 1 100%;
+    padding: 20px 30px;
+    width: 100%;
   }
 }
 
-/* Breakpoint for large phones (640px and under) */
-@media (max-width: 640px) {
+/* Breakpoint for phones (480px and under) */
+@media (max-width: 480px) {
   .hero {
     padding: 20px;
     width: 100%;
@@ -390,26 +448,19 @@ a {
     padding: 0;
     width: auto;
     max-width: 100%;
-    font-size: clamp(24px, 5vw, 40px);
+    font-size: clamp(24px, 6.4vw, 40px);
   }
 
   .hero-description {
     margin: 15px 0;
     padding: 0;
-    width: 90%;
-    min-width: unset;
     text-align: center;
-    font-size: clamp(16px, 4vw, 24px);
+    font-size: 18px;
   }
 
   .header, .footer {
     flex-direction: column;
     text-align: center;
-  }
-
-  .toggle-btn {
-    display: block;
-    cursor: pointer;
   }
 
   nav ul {

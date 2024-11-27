@@ -1,15 +1,12 @@
 // Customize navbar on scroll
 const header = document.querySelector(".header");
-const navLinks = document.querySelector(".nav-links");
 const main = document.querySelector("main"); // Change this to your scrollable element
 
 main.addEventListener("scroll", () => {
   if (main.scrollTop > 50) {
     header.classList.add("header-scrolled");
-    navLinks.classList.add("nav-links-scrolled");
   } else {
     header.classList.remove("header-scrolled");
-    navLinks.classList.remove("nav-links-scrolled");
   }
 });
 
@@ -42,3 +39,15 @@ VanillaTilt.init(document.querySelector(".panel-img"), {
   speed: 400,
   reverse: true,
 });
+
+// Make navigation bar responsive on small screens
+function mobileNavbar() {
+  var navbar = document.querySelector(".navbar");
+  if (navbar.className === "navbar") {
+    navbar.className += " responsive";
+    main.style.top = "200px";
+  } else {
+    navbar.className = "navbar";
+    main.style.top = "0";
+  }
+}

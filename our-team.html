@@ -14,21 +14,17 @@
 <body>
 
   <header class="header">
-    <a href="/" class="logo">
-      <img class="logo-img" src="images/i2iLogoTextOrange.png" alt="i2i Logo">
-    </a>
-    <nav>
-      <ul class="nav-links">
-        <li><a href="./our-team.html" class="nav-link line-hover">Our Team</a></li>
-        <li><a href="./startups.html" class="nav-link line-hover">Startups</a></li>
-        <li><a href="./events.html" class="nav-link line-hover">Events</a></li>
-        <li><a href="./contact.html" class="nav-link line-hover">Get in Touch</a></li>
-      </ul>
-      <div class="toggle-btn">
-        <div class="line-one"></div>
-        <div class="line-two"></div>
-        <div class="line-three"></div>
-      </div>
+    <nav class="navbar">
+      <a href="/" class="logo">
+        <img class="logo-img" src="images/i2iLogoTextOrange.png" alt="i2i Logo">
+      </a>
+      <a href="./our-team.html" class="nav-link line-hover">Our Team</a></li>
+      <a href="./startups.html" class="nav-link line-hover">Startups</a></li>
+      <a href="./events.html" class="nav-link line-hover">Events</a></li>
+      <a href="./get-in-touch.html" class="nav-link line-hover">Get in Touch</a></li>
+      <a href="javascript:void(0);" class="icon" onclick="mobileNavbar()">
+        <i class="fa fa-bars"></i>
+      </a>
     </nav>
   </header>
 
@@ -123,5 +119,6 @@
       zoom: 0.50
     });
   </script>
+
 </body>
 </html>
