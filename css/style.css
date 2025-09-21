@@ -188,10 +188,13 @@ header {
   flex-wrap: wrap;
   justify-content: left; 
   gap: 2rem;
-  
-  max-width: 1400px; /* Control container width */
-  margin: 0 auto; /* Center the container */
-  width: 90%;
+}
+
+#startups-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; 
+  gap: 2rem;
 }
 
 .index-card {

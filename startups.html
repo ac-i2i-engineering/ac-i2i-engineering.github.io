@@ -63,63 +63,10 @@
         <li>Grand Plans or Shower Thoughts</li>
       </ul>
       <p><strong>If you have an idea or solution, we can help you build it!</strong></p>
-    </section>
-    <section id="index-info" class="info-sections">
-        <div class="index-card" id="Amherst-Connect">
-          <img src="images/Amherst-Connect.png" alt="Amherst Connect">
-          <div>
-            <h2 class="team-lead">Amherst Connect</h2>
-            <p>Database and interface for events at Amherst. One-stop shop for looking at the big pictures of all events at Amherst!</p>
-            <a href="https://github.com/ac-i2i-engineering/access-amherst">GitHub Project Repository→</a>
-          </div>
-        </div>
-        
-        <div class="index-card" id="Matching-Engine">
-          <img src="images/Matching-Engine.png" alt="Matching Engine">
-          <div>
-            <h2>Matching Engine</h2>
-            <p>This is the matching engine we are building to match students with each other & ideas!</p>
-            <a href="https://github.com/ac-i2i-engineering/matching-engine">GitHub Project Repository→</a>
-          </div>
-        </div>
-
-        <div class="index-card" id="Amherst-Coursework">
-          <img src="images/amherst_coursework.png" alt="Amherst Coursework">
-          <div>
-            <h2>Amherst Coursework</h2>
-            <p>Amherst Coursework is a web application that provides Amherst College students and faculty with an intuitive, advanced interface for course search.</p>
-            <a href="https://github.com/ac-i2i-engineering/amherst-coursework">GitHub Project Repository→</a>
-          </div>
-        </div>
-
-        <div class="index-card" id="Resumax">
-          <img src="images/resumax.png" alt="Resumax">
-          <div>
-            <h2>Resumax</h2>
-            <p>Resumax is an AI chatbot designed to help students enhance their resumes effectively.</p>
-            <a href="https://github.com/ac-i2i-engineering/resumax">GitHub Project Repository→</a>
-          </div>
-        </div>
-
-        <div class="index-card" id="MatPlus">
-          <img src="images/mat_plus.png" alt="MatPlus">
-          <div>
-            <h2>MatPlus</h2>
-            <p>A Python package for effortlessly creating stunning plots.</p>
-            <a href="https://github.com/ac-i2i-engineering/mat-plus">GitHub Project Repository→</a>
-          </div>
-        </div>
-
-        <div class="index-card" id="lost-and-found">
-          <img src="images/amherst-lost-and-found.png" alt="Amherst Lost and Found">
-          <div>
-            <h2>Amherst Lost and Found</h2>
-            <p>Each year, campuses gather tons of lost items—many go to landfills. Our Django-based Amherst Lost & Found app uses AI and maps to reunite items with owners, cutting waste and helping the planet.</p>
-            <a href="https://github.com/Tetsuya787/LostandFound">GitHub Project Repository→</a>
-          </div>
-        </div>
-
-    </section>
+      </section>
+      <section id="index-info" class="info-sections">
+        <div id="startups-container"></div>
+      </section>
     <footer class="footer">
       
       <div class="footer-content">
@@ -168,6 +115,42 @@
   <!-- Custom JS -->
   <script src="js/app.js"></script>
   <script src="js/initAOS.js"></script>
+  <script>
+    fetch('startups.json')
+      .then(response => response.json())
+      .then(startups => {
+        const container = document.getElementById('startups-container');
+        startups.forEach(startup => {
+          const card = document.createElement('div');
+          card.className = 'index-card';
+          card.id = startup.id;
+
+          const img = document.createElement('img');
+          img.src = startup.image;
+          img.alt = startup.alt;
+          card.appendChild(img);
+
+          const infoDiv = document.createElement('div');
+
+          const h2 = document.createElement('h2');
+          h2.textContent = startup.title;
+          h2.className = 'team-lead';
+          infoDiv.appendChild(h2);
+
+          const p = document.createElement('p');
+          p.textContent = startup.description;
+          infoDiv.appendChild(p);
+
+          const a = document.createElement('a');
+          a.href = startup.github_url;
+          a.textContent = startup.github_text;
+          infoDiv.appendChild(a);
+
+          card.appendChild(infoDiv);
+          container.appendChild(card);
+        });
+      });
+  </script>
   <script>
     VANTA.NET({
       el: "#vanta-bg",
