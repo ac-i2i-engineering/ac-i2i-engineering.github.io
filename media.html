@@ -46,94 +46,8 @@
         Explore opportunities to turn your ideas into reality through our workshops, pitch competitions, and networking sessions. At I2I, we provide the tools, mentorship, and community support you need to succeed and bring your vision to life!</p>
 
       <div id="team-cards">
-        <div class="gallery">
-            <div class="gallery-item" style="order: 22">
-                <img src="../images/Media-Gallery/TeamDiscussion3.jpg" alt="Team Discussion 3">
-            </div>
-        
-            <div class="gallery-item" style="order: 8">
-                <img src="../images/Media-Gallery/Coding4.jpg" alt="Coding 4">
-            </div>
-        
-            <div class="gallery-item" style="order: 15">
-                <img src="../images/Media-Gallery/TeamPhoto2.jpg" alt="Team Photo 2">
-            </div>
-        
-            <div class="gallery-item" style="order: 3">
-                <img src="../images/Media-Gallery/Brainstorm1.jpg" alt="Brainstorm1">
-            </div>
-        
-            <div class="gallery-item" style="order: 17">
-                <img src="../images/Media-Gallery/TeamDiscussion7.jpg" alt="Team Discussion 7">
-            </div>
-        
-            <div class="gallery-item" style="order: 11">
-                <img src="../images/Media-Gallery/Coding1.jpg" alt="Coding 1">
-            </div>
-        
-            <div class="gallery-item" style="order: 7">
-                <img src="../images/Media-Gallery/TeamPhoto4.jpg" alt="Team Photo 4">
-            </div>
-        
-            <div class="gallery-item" style="order: 6">
-                <img src="../images/Media-Gallery/TeamDiscussion1.jpg" alt="Team Discussion 1">
-            </div>
-        
-            <div class="gallery-item" style="order: 13">
-                <img src="../images/Media-Gallery/Mentorship2.jpg" alt="Mentorship 2">
-            </div>
-        
-            <div class="gallery-item" style="order: 1">
-                <img src="../images/Media-Gallery/Working1.jpg" alt="Working Photo 1">
-            </div>
-        
-            <div class="gallery-item" style="order: 4">
-                <img src="../images/Media-Gallery/TeamDiscussion4.jpg" alt="Team Discussion 4">
-            </div>
-        
-            <div class="gallery-item" style="order: 20">
-                <img src="../images/Media-Gallery/Coding3.jpg" alt="Coding 3">
-            </div>
-        
-            <div class="gallery-item" style="order: 16">
-                <img src="../images/Media-Gallery/TeamPhoto1.jpg" alt="Team Photo 1">
-            </div>
-        
-            <div class="gallery-item" style="order: 9">
-                <img src="../images/Media-Gallery/TeamDiscussion8.jpg" alt="Team Discussion 8">
-            </div>
-        
-            <div class="gallery-item" style="order: 21">
-                <img src="../images/Media-Gallery/TeamDiscussion2.jpg" alt="Team Discussion 2">
-            </div>
-        
-            <div class="gallery-item" style="order: 12">
-                <img src="../images/Media-Gallery/TeamPhoto5.jpg" alt="Team Photo 5">
-            </div>
-        
-            <div class="gallery-item" style="order: 19">
-                <img src="../images/Media-Gallery/Coding5.jpg" alt="Coding 5">
-            </div>
-        
-            <div class="gallery-item" style="order: 18">
-                <img src="../images/Media-Gallery/TeamDiscussion5.jpg" alt="Team Discussion 5">
-            </div>
-        
-            <div class="gallery-item" style="order: 5">
-                <img src="../images/Media-Gallery/Mentorship1.jpg" alt="Mentorship 1">
-            </div>
-        
-            <div class="gallery-item" style="order: 14">
-                <img src="../images/Media-Gallery/Brainstorm2.jpg" alt="Brainstorm2">
-            </div>
-        
-            <div class="gallery-item" style="order: 2">
-                <img src="../images/Media-Gallery/TeamPhoto3.jpg" alt="Team Photo 3">
-            </div>
-        
-            <div class="gallery-item" style="order: 10">
-                <img src="../images/Media-Gallery/Coding2.jpg" alt="Coding 2">
-            </div>
+        <div class="gallery" id="media-gallery">
+            <!-- Gallery items will be dynamically loaded from media.json -->
         </div>
           
           <!-- Modal Container -->
@@ -202,6 +116,42 @@
       waveHeight: 30.00,
       zoom: 0.50
     });
+
+    // Load gallery images from media.json
+    async function loadGallery() {
+      try {
+        const response = await fetch('data/media.json');
+        const images = await response.json();
+        const gallery = document.getElementById('media-gallery');
+        
+        images.forEach((imagePath, index) => {
+          // Create gallery item
+          const galleryItem = document.createElement('div');
+          galleryItem.className = 'gallery-item';
+          galleryItem.style.order = index + 1;
+          
+          // Create image element
+          const img = document.createElement('img');
+          img.src = imagePath;
+          
+          // Generate alt text from filename
+          const filename = imagePath.split('/').pop().replace('.jpg', '');
+          const altText = filename.replace(/([A-Z0-9])/g, ' $1').replace(/^\s*/, '').replace(/^\w/, c => c.toUpperCase());
+          img.alt = altText;
+          
+          // Add image to gallery item
+          galleryItem.appendChild(img);
+          
+          // Add gallery item to gallery
+          gallery.appendChild(galleryItem);
+        });
+      } catch (error) {
+        console.error('Error loading gallery:', error);
+      }
+    }
+
+    // Load gallery when page loads
+    document.addEventListener('DOMContentLoaded', loadGallery);
   </script>
 
 </body>
