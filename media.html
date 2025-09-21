@@ -121,8 +121,14 @@
     async function loadGallery() {
       try {
         const response = await fetch('data/media.json');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const images = await response.json();
         const gallery = document.getElementById('media-gallery');
+        
+        // Create document fragment for batch DOM operations
+        const fragment = document.createDocumentFragment();
         
         images.forEach((imagePath, index) => {
           // Create gallery item
@@ -142,9 +148,12 @@
           // Add image to gallery item
           galleryItem.appendChild(img);
           
-          // Add gallery item to gallery
-          gallery.appendChild(galleryItem);
+          // Add gallery item to fragment (no DOM reflow)
+          fragment.appendChild(galleryItem);
         });
+        
+        // Single DOM operation - append all items at once
+        gallery.appendChild(fragment);
       } catch (error) {
         console.error('Error loading gallery:', error);
       }
