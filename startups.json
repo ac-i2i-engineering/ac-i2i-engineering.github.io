@@ -1,0 +1,56 @@
+[
+  {
+    "id": "Amherst-Connect",
+    "image": "images/Amherst-Connect.png",
+    "alt": "Amherst Connect",
+    "title": "Amherst Connect",
+    "description": "Database and interface for events at Amherst. One-stop shop for looking at the big pictures of all events at Amherst!",
+    "github_url": "https://github.com/ac-i2i-engineering/access-amherst",
+    "github_text": "GitHub Project Repository→"
+  },
+  {
+    "id": "Matching-Engine",
+    "image": "images/Matching-Engine.png",
+    "alt": "Matching Engine",
+    "title": "Matching Engine",
+    "description": "This is the matching engine we are building to match students with each other & ideas!",
+    "github_url": "https://github.com/ac-i2i-engineering/matching-engine",
+    "github_text": "GitHub Project Repository→"
+  },
+  {
+    "id": "Amherst-Coursework",
+    "image": "images/amherst_coursework.png",
+    "alt": "Amherst Coursework",
+    "title": "Amherst Coursework",
+    "description": "Amherst Coursework is a web application that provides Amherst College students and faculty with an intuitive, advanced interface for course search.",
+    "github_url": "https://github.com/ac-i2i-engineering/amherst-coursework",
+    "github_text": "GitHub Project Repository→"
+  },
+  {
+    "id": "Resumax",
+    "image": "images/resumax.png",
+    "alt": "Resumax",
+    "title": "Resumax",
+    "description": "Resumax is an AI chatbot designed to help students enhance their resumes effectively.",
+    "github_url": "https://github.com/ac-i2i-engineering/resumax",
+    "github_text": "GitHub Project Repository→"
+  },
+  {
+    "id": "MatPlus",
+    "image": "images/mat_plus.png",
+    "alt": "MatPlus",
+    "title": "MatPlus",
+    "description": "A Python package for effortlessly creating stunning plots.",
+    "github_url": "https://github.com/ac-i2i-engineering/mat-plus",
+    "github_text": "GitHub Project Repository→"
+  },
+  {
+    "id": "lost-and-found",
+    "image": "images/amherst-lost-and-found.png",
+    "alt": "Amherst Lost and Found",
+    "title": "Amherst Lost and Found",
+    "description": "Each year, campuses gather tons of lost items—many go to landfills. Our Django-based Amherst Lost & Found app uses AI and maps to reunite items with owners, cutting waste and helping the planet.",
+    "github_url": "https://github.com/Tetsuya787/LostandFound",
+    "github_text": "GitHub Project Repository→"
+  }
+]

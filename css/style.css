@@ -188,10 +188,13 @@ header {
   flex-wrap: wrap;
   justify-content: left; 
   gap: 2rem;
-  
-  max-width: 1400px; /* Control container width */
-  margin: 0 auto; /* Center the container */
-  width: 90%;
+}
+
+#startups-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; 
+  gap: 2rem;
 }
 
 .index-card {
@@ -255,9 +258,42 @@ header {
 }
 
 .teamlead-info img {
+  display: inline-block;
+  margin: 10px 5px;
+  max-width: 45%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.teamlead-info img:only-child {
   display: block;
   margin: 20px auto;
   max-width: 90%;
+}
+
+.ryan-ji-img {
+  width: 150px !important;
+  height: 200px !important;
+  object-fit: cover !important;
+  margin-bottom: 20px !important;
+}
+
+.liam-davis-img {
+  width: 150px !important;
+  height: 200px !important;
+  object-fit: cover !important;
+  margin-bottom: 20px !important;
+}
+ 
+.financing-lead-img {
+  width: 150px !important;
+  height: 200px !important;
+  margin-top: 50px !important;
+}
+
+.consulting-team-lead {
+  margin-top: 26px !important;
 }
 
 .teamlead-name {
@@ -272,7 +308,7 @@ header {
   font-style: italic;
 }
 .teamlead-time{
-  font-color: --var(--primary-color);
+  color: var(--primary-color);
   font-style: italic;
   font-size: 0.875rem;
   text-decoration: underline;
