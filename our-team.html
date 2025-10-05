@@ -43,61 +43,7 @@
       <h2 class="section-title">Our Team</h2>
       <p>Four student teams capitalize on Amherst’s strengths. We've structured teams to <strong>accelerate learning and experiences</strong> for members, exposing them to various industries and projects.</p>
 
-      <div id="team-cards">
-        <div class="team-card">
-          <h3>Engineering Team</h3>
-          <p><strong>Design, code, deploy</strong></p>
-          <p>Whether it’s full-stack app development, system design, AI engineering, or simple API calls, 
-            it’s hard to have ideas that don’t need some type of engineering support these days. 
-            These engineers help <strong>design, code, and deploy</strong> ideas.</p>
-          <a href="https://github.com/ac-i2i-engineering">GitHub Organization →</a>
-          <div class="teamlead-info">
-            <img src="../images/ryan_ji.JPG" alt="Engineering Team Lead" class="ryan-ji-img">
-            <img src="../images/liam_davis.jpg" alt="Engineering Team Lead" class="liam-davis-img">
-            <p class="teamlead-name">Ryan Ji and Liam Davis</p>
-            <p class="teamlead-role">Executive Directors of Engineering</p>
-          </div>
-        </div>
-
-        <div class="team-card">
-          <h3>Financing Team</h3>
-          <p><strong>Fund, manage, advise</strong></p>
-          <p>From grants to crowd-sourcing, there are various approaches to equip student ideas with monetary resources. 
-            But startups must be efficient and prudent with their limited finances. 
-            This team <strong>advises students on financial actions and strategy</strong>.</p>
-          <div class="teamlead-info">
-            <img src="../images/financing-lead.png" alt="Financing Team Lead" class="financing-lead-img">
-            <p class="teamlead-name">Nikolai Dammholz</p>
-            <p class="teamlead-role">Executive Director of Financing</p>
-          </div>
-        </div>
-
-        <div class="team-card">
-          <h3>Creative Team</h3>
-          <p><strong>Curate a story</strong></p>
-          <p>Communication is the cornerstone of innovation. This is a team of storytellers who can 
-            <strong>transform concepts into compelling narratives and visual experiences.</strong> These members lead design and content 
-            production for i2i and student ideas in need of a voice.</p>
-          <div class="teamlead-info">
-            <img src="../images/creative-lead.png" alt="Creative Team Lead">
-            <p class="teamlead-name">Claire Liu</p>
-            <p class="teamlead-role">Executive Director of Creative</p>
-          </div>
-        </div>
-
-        <div class="team-card">
-          <h3>Consulting Team</h3>
-          <p><strong>Work 1:1 with startups</strong></p>
-          <p>We have a myriad of resources for big dreamers, and we want to make it effortless for ideas to grow. 
-            This team works <strong>1-on-1 with students to facilitate the execution 
-            of their ideas</strong> by connecting all the pieces of i2i together.</p>
-          <div class="teamlead-info">
-            <img src="../images/catalyst-lead.png" alt="Consulting Team Lead" class="consulting-team-lead">
-            <p class="teamlead-name">Alex Nichols</p>
-            <p class="teamlead-role">Executive Director of Consulting</p>
-          </div>
-        </div>
-      </div>
+            <div id="team-cards"></div>
     </section>
 
     <footer class="footer">
@@ -149,6 +95,90 @@
   <script src="js/app.js"></script>
   <script src="js/initAOS.js"></script>
   <script>
+    // Load team data from JSON
+    fetch('team.json')
+      .then(response => response.json())
+      .then(teams => {
+        const container = document.getElementById('team-cards');
+        const fragment = document.createDocumentFragment();
+        teams.forEach(team => {
+          const card = document.createElement('div');
+          card.className = 'team-card';
+          card.id = team.id;
+
+          // Create the main content
+          const h3 = document.createElement('h3');
+          h3.textContent = team.title;
+          card.appendChild(h3);
+
+          const subtitle = document.createElement('p');
+          subtitle.innerHTML = `<strong>${team.subtitle}</strong>`;
+          card.appendChild(subtitle);
+
+          const description = document.createElement('p');
+          description.textContent = team.description;
+          card.appendChild(description);
+
+          // Add link if it exists
+          if (team.link) {
+            const link = document.createElement('a');
+            link.href = team.link.url;
+            link.textContent = team.link.text;
+            card.appendChild(link);
+          }
+
+          // Create team lead info section
+          const teamleadInfo = document.createElement('div');
+          teamleadInfo.className = 'teamlead-info';
+
+          // Handle leaders (single or multiple)
+          if (team.leaders.length > 1) {
+            const leadersContainer = document.createElement('div');
+            leadersContainer.className = `${team.id}-leaders`;
+            
+            team.leaders.forEach((leader, index) => {
+              const img = document.createElement('img');
+              img.src = leader.image;
+              img.alt = leader.alt;
+              img.className = `${team.id}-lead-${index}-img`;
+              leadersContainer.appendChild(img);
+            });
+            
+            teamleadInfo.appendChild(leadersContainer);
+          } else {
+            // Single leader handling
+            const img = document.createElement('img');
+            img.src = team.leaders[0].image;
+            img.alt = team.leaders[0].alt;
+            img.className = `${team.id}-lead-img`;
+            teamleadInfo.appendChild(img);
+          }
+
+          // Add leader names (combine if multiple)
+          const nameP = document.createElement('p');
+          nameP.className = 'teamlead-name';
+          if (team.leaders.length > 1) {
+            nameP.textContent = team.leaders.map(leader => leader.name).join(' and ');
+          } else {
+            nameP.textContent = team.leaders[0].name;
+          }
+          teamleadInfo.appendChild(nameP);
+
+          // Add leader roles (use first role if multiple)
+          const roleP = document.createElement('p');
+          roleP.className = 'teamlead-role';
+          roleP.textContent = team.leaders[0].role;
+          teamleadInfo.appendChild(roleP);
+          card.appendChild(teamleadInfo);
+          fragment.appendChild(card);
+          
+        });
+        container.appendChild(fragment);
+      })
+      .catch(error => {
+        console.error('Error loading team data:', error);
+      });
+
     VANTA.NET({
       el: "#vanta-bg",
       color: 0xff5722,
