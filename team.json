@@ -1,0 +1,68 @@
+[
+  {
+    "id": "engineering",
+    "title": "Engineering Team",
+    "subtitle": "Design, code, deploy",
+    "description": "Whether it's full-stack app development, system design, AI engineering, or simple API calls, it's hard to have ideas that don't need some type of engineering support these days. These engineers help design, code, and deploy ideas.",
+    "link": {
+      "url": "https://github.com/ac-i2i-engineering",
+      "text": "GitHub Organization →"
+    },
+    "leaders": [
+      {
+        "name": "Ryan Ji",
+        "role": "Executive Director of Engineering",
+        "image": "images/ryan_ji.JPG",
+        "alt": "Ryan Ji - Engineering Team Lead"
+      },
+      {
+        "name": "Liam Davis", 
+        "role": "Executive Director of Engineering",
+        "image": "images/liam_davis.jpg",
+        "alt": "Liam Davis - Engineering Team Lead"
+      }
+    ]
+  },
+  {
+    "id": "financing",
+    "title": "Financing Team",
+    "subtitle": "Fund, manage, advise",
+    "description": "From grants to crowd-sourcing, there are various approaches to equip student ideas with monetary resources. But startups must be efficient and prudent with their limited finances. This team advises students on financial actions and strategy.",
+    "leaders": [
+      {
+        "name": "Nikolai Dammholz",
+        "role": "Executive Director of Financing",
+        "image": "images/financing-lead.png",
+        "alt": "Nikolai Dammholz - Financing Team Lead"
+      }
+    ]
+  },
+  {
+    "id": "creative",
+    "title": "Creative Team",
+    "subtitle": "Curate a story",
+    "description": "Communication is the cornerstone of innovation. This is a team of storytellers who can transform concepts into compelling narratives and visual experiences. These members lead design and content production for i2i and student ideas in need of a voice.",
+    "leaders": [
+      {
+        "name": "Claire Liu",
+        "role": "Executive Director of Creative",
+        "image": "images/creative-lead.png",
+        "alt": "Claire Liu - Creative Team Lead"
+      }
+    ]
+  },
+  {
+    "id": "consulting",
+    "title": "Consulting Team",
+    "subtitle": "Work 1:1 with startups",
+    "description": "We have a myriad of resources for big dreamers, and we want to make it effortless for ideas to grow. This team works 1-on-1 with students to facilitate the execution of their ideas by connecting all the pieces of i2i together.",
+    "leaders": [
+      {
+        "name": "Alex Nichols",
+        "role": "Executive Director of Consulting",
+        "image": "images/catalyst-lead.png",
+        "alt": "Alex Nichols - Consulting Team Lead"
+      }
+    ]
+  }
+]

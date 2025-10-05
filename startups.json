@@ -6,7 +6,9 @@
     "title": "Amherst Connect",
     "description": "Database and interface for events at Amherst. One-stop shop for looking at the big pictures of all events at Amherst!",
     "github_url": "https://github.com/ac-i2i-engineering/access-amherst",
-    "github_text": "GitHub Project Repository→"
+    "github_text": "GitHub Project Repository→",
+    "test_url": "https://amherst-connect.com/",
+    "test_text": "Test the App→"
   },
   {
     "id": "Matching-Engine",
@@ -24,7 +26,9 @@
     "title": "Amherst Coursework",
     "description": "Amherst Coursework is a web application that provides Amherst College students and faculty with an intuitive, advanced interface for course search.",
     "github_url": "https://github.com/ac-i2i-engineering/amherst-coursework",
-    "github_text": "GitHub Project Repository→"
+    "github_text": "GitHub Project Repository→",
+    "test_url": "https://amherstcourses.com/",
+    "test_text": "Test the App→"
   },
   {
     "id": "Resumax",

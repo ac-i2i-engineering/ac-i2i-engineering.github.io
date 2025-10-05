@@ -191,21 +191,25 @@ header {
 }
 
 #startups-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center; 
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  grid-template-rows: repeat(3, auto);   /* 3 rows, auto-sizing */
   gap: 2rem;
+  justify-items: center;
+  max-width: 1400px;
+  margin: 20 auto;
 }
 
 .index-card {
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 10px;
-  margin: 1rem; 
   box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-  flex: 0 1 calc(33.333% - 2rem); /* Changed to calculate 3 cards per row */
-  margin: 0;              /* Reset margin to use gap instead */
+  width: 100%;
+  max-width: 500px;       /* Maximum card width */
   min-width: 300px;       /* Minimum card width */
-  max-width: 400px;       /* Maximum card width */
+  height: 600px;          /* Fixed height for all cards */
+  display: flex;
+  flex-direction: column;
 }
 
 .index-card img {
@@ -217,6 +221,10 @@ header {
 
 .index-card div {
   padding: 40px;
+  flex: 1;                /* Allow content div to expand and fill remaining space */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Distribute content evenly */
 }
 
 .index-card h2 {
@@ -226,6 +234,73 @@ header {
 
 .index-card a {
   color: var(--secondary-color);
+}
+
+/* Startup link styles */
+.startup-link {
+  display: inline-block;
+  margin: 8px 8px 8px 0;  /* Reduced right margin to move links closer to left */
+  padding: 12px 16px;     /* Increased padding for better text fit */
+  background-color: var(--primary-color);
+  color: white !important;
+  text-decoration: none;
+  border-radius: 6px;     /* Slightly larger border radius */
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;    /* Prevent text wrapping */
+  min-width: fit-content; /* Ensure container fits content */
+}
+ 
+
+.startup-link:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 112, 68, 0.3);
+}
+
+.github-link {
+  background-color: #333333;
+}
+
+.github-link:hover {
+  background-color: #555;
+}
+
+.test-link {
+  background-color: var(--primary-color);
+}
+
+.test-link:hover {
+  background-color: var(--secondary-color);
+}
+
+.startup-links {
+  margin-top: 15px;
+  margin-left: -35px;     /* Move the entire link container to the left */
+  gap: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* Align links to the left */
+  align-items: flex-start;
+}
+
+/* Responsive 3x3 grid for startups */
+@media (max-width: 1200px) {
+  #startups-container {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on medium screens */
+    max-width: 900px;
+  }
+}
+
+@media (max-width: 768px) {
+  #startups-container {
+    grid-template-columns: 1fr; /* 1 column on small screens */
+    max-width: 500px;
+  }
+  
+  .index-card {
+    min-width: 280px;
+  }
 }
 
 #team-cards {
@@ -255,6 +330,16 @@ header {
 .teamlead-info {
   margin: 40px auto 0 auto;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.teamlead-info .image-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;  /* Align images to top */
+  gap: 20px;               /* Space between images */
+  margin-bottom: 20px;
 }
 
 .teamlead-info img {
@@ -272,24 +357,92 @@ header {
   max-width: 90%;
 }
 
-.ryan-ji-img {
-  width: 150px !important;
-  height: 200px !important;
-  object-fit: cover !important;
-  margin-bottom: 20px !important;
+/* Engineering team - Flexbox approach for dual leaders */
+.engineering-leaders {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  gap: 20px !important;
+  margin: 20px 0 !important;
 }
 
+.ryan-ji-img,
 .liam-davis-img {
   width: 150px !important;
   height: 200px !important;
   object-fit: cover !important;
-  margin-bottom: 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  border-radius: 8px !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  top: 0 !important;
 }
  
-.financing-lead-img {
+/* Financing team lead container */
+.financing .teamlead-info {
+  padding-bottom: 50px !important;  /* Custom padding for financing team container */
+  padding-top: 1000px !important;  /* Custom padding for financing team container */
+
+}
+
+.teamlead-info .financing-lead-img {
   width: 150px !important;
   height: 200px !important;
-  margin-top: 50px !important;
+  margin: 0 0 50px 0 !important;    /* Add 40px bottom margin for space below image */
+  object-fit: cover !important;
+  position: relative !important;
+  z-index: 1 !important;
+  transform: translateY(32px) !important;
+  max-width: none !important;
+  max-height: none !important;
+  border-radius: 8px !important;
+}
+
+/* Creative team lead image */
+.creative-lead-img {
+  width: 150px !important;
+  height: 200px !important;
+  object-fit: cover !important;
+  border-radius: 8px !important;
+  margin: 20px auto !important;
+  display: block !important;
+  max-width: none !important;
+  max-height: none !important;
+  position: relative !important;
+  transform: translateY(-15px) !important;  /* Move image 30px upwards */
+}
+
+/* Consulting team lead image */
+.consulting-lead-img {
+  width: 150px !important;
+  height: 200px !important;
+  object-fit: cover !important;
+  border-radius: 8px !important;
+  margin: 12px auto 53px auto !important;  /* Added bottom margin for space below image */
+  display: block !important;
+  max-width: none !important;
+  max-height: none !important;
+  position: relative !important;
+  transform: translateY(8px) !important;  /* Move image 30px upwards */
+}
+
+/* Consulting team title positioning */
+.consulting .teamlead-name {
+  margin: 0 !important;
+  font-size: 1.2rem;
+  font-weight: 600;
+  transform: translateY(-20px) !important;  /* Move name 20px upwards */
+  position: relative !important;
+}
+
+.consulting .teamlead-role {
+  margin-top: 10px !important;
+  font-size: 1rem;
+  font-style: italic;
+  transform: translateY(-20px) !important;  /* Move role 20px upwards */
+  position: relative !important;
 }
 
 .consulting-team-lead {
