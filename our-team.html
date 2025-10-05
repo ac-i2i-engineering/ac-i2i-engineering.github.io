@@ -100,6 +100,7 @@
       .then(response => response.json())
       .then(teams => {
         const container = document.getElementById('team-cards');
+        const fragment = document.createDocumentFragment();
         teams.forEach(team => {
           const card = document.createElement('div');
           card.className = 'team-card';
@@ -130,33 +131,27 @@
           const teamleadInfo = document.createElement('div');
           teamleadInfo.className = 'teamlead-info';
 
-          // Special handling for engineering team with multiple leaders
-          if (team.id === 'engineering' && team.leaders.length > 1) {
+          // Handle leaders (single or multiple)
+          if (team.leaders.length > 1) {
             const leadersContainer = document.createElement('div');
-            leadersContainer.className = 'engineering-leaders';
+            leadersContainer.className = `${team.id}-leaders`;
             
             team.leaders.forEach((leader, index) => {
               const img = document.createElement('img');
               img.src = leader.image;
               img.alt = leader.alt;
-              if (index === 0) {
-                img.className = 'ryan-ji-img';
-              } else {
-                img.className = 'liam-davis-img';
-              }
+              img.className = `${team.id}-lead-${index}-img`;
               leadersContainer.appendChild(img);
             });
             
             teamleadInfo.appendChild(leadersContainer);
           } else {
-            // Regular single leader handling
-            team.leaders.forEach(leader => {
-              const img = document.createElement('img');
-              img.src = leader.image;
-              img.alt = leader.alt;
-              img.className = `${team.id}-lead-img`;
-              teamleadInfo.appendChild(img);
-            });
+            // Single leader handling
+            const img = document.createElement('img');
+            img.src = team.leaders[0].image;
+            img.alt = team.leaders[0].alt;
+            img.className = `${team.id}-lead-img`;
+            teamleadInfo.appendChild(img);
           }
 
           // Add leader names (combine if multiple)
@@ -174,10 +169,11 @@
           roleP.className = 'teamlead-role';
           roleP.textContent = team.leaders[0].role;
           teamleadInfo.appendChild(roleP);
-
           card.appendChild(teamleadInfo);
-          container.appendChild(card);
+          fragment.appendChild(card);
+          
         });
+        container.appendChild(fragment);
       })
       .catch(error => {
         console.error('Error loading team data:', error);

@@ -207,7 +207,7 @@ header {
   width: 100%;
   max-width: 500px;       /* Maximum card width */
   min-width: 300px;       /* Minimum card width */
-  height: 600px;          /* Fixed height for all cards */
+  height: 700px;          /* Fixed height for all cards */
   display: flex;
   flex-direction: column;
 }
@@ -215,8 +215,10 @@ header {
 .index-card img {
   border-radius: 10px 10px 0 0;
   width: 100%;
-  height: 240px;
+  height: 240px !important;  /* Force consistent height */
   object-fit: cover;
+  display: block;            /* Ensure proper display */
+  flex-shrink: 0;           /* Prevent image from shrinking */
 }
 
 .index-card div {
@@ -366,8 +368,8 @@ header {
   margin: 20px 0 !important;
 }
 
-.ryan-ji-img,
-.liam-davis-img {
+
+[class^="engineering-lead-"][class$="-img"] {
   width: 150px !important;
   height: 200px !important;
   object-fit: cover !important;
