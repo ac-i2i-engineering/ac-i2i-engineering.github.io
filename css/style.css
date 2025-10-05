@@ -191,25 +191,21 @@ header {
 }
 
 #startups-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 columns */
-  grid-template-rows: repeat(3, auto);   /* 3 rows, auto-sizing */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; 
   gap: 2rem;
-  justify-items: center;
-  max-width: 1400px;
-  margin: 20 auto;
 }
 
 .index-card {
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 10px;
+  margin: 1rem; 
   box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-  width: 100%;
-  max-width: 500px;       /* Maximum card width */
+  flex: 0 1 calc(33.333% - 2rem); /* Changed to calculate 3 cards per row */
+  margin: 0;              /* Reset margin to use gap instead */
   min-width: 300px;       /* Minimum card width */
-  height: 700px;          /* Fixed height for all cards */
-  display: flex;
-  flex-direction: column;
+  max-width: 400px;       /* Maximum card width */
 }
 
 .index-card img {
@@ -223,10 +219,6 @@ header {
 
 .index-card div {
   padding: 40px;
-  flex: 1;                /* Allow content div to expand and fill remaining space */
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* Distribute content evenly */
 }
 
 .index-card h2 {
