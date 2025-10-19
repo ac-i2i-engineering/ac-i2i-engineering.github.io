@@ -12,6 +12,7 @@
   --text-color: #000000;
   --accent-color: #F8E0C9;
   --font-family: 'Inter', sans-serif;
+  --mammoth-purple: #3F1F69;
 }
 
 html, body {
@@ -229,6 +230,12 @@ header {
 .index-card a {
   color: var(--secondary-color);
 }
+
+.index-card a.secondary-link {
+  color: var(--mammoth-purple);
+}
+
+
 
 /* Startup link styles */
 .startup-link {
