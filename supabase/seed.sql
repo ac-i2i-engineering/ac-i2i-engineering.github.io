@@ -1,0 +1,13 @@
+-- Owner: Database + API.
+-- One-off seed migrating existing content into Supabase so the admin panel
+-- and public site have real data to build/demo against:
+--   ../team.json        -> team_departments, team_members
+--   ../startups.json    -> startups
+--   ../data/media.json  -> media
+--
+-- Keep existing "images/..." relative paths as `url` values for now -- no
+-- need to re-upload files into Storage buckets today; that can happen later
+-- via the Media Manager once it's built.
+--
+-- Run with: npx supabase db reset (local) or paste into the SQL editor /
+-- `psql` against the linked project.
