@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Our Team - i2i Amherst Venture Accelerator</title>
+  <title>Events - i2i Amherst Venture Accelerator</title>
   <!-- Favicon -->
   <link rel="icon" href="images/logo-transparent.png">
   <!-- AOS CSS -->
@@ -75,7 +75,6 @@
           </div>
         </div>
 
-
         <div class="team-card">
           <p class="teamlead-time">Sunday, November 10, 2024, @ 12pm, SCCE E108 </p>
           <h3 class = "teamlead-title">STARTUPLAB</h3>
@@ -111,9 +110,7 @@
     </section>
 
     <footer class="footer">
-     
       <div class="footer-content">
-        
         <div class="footer-section">
           <a href = "/" class="footer-logo">
             <img src="images/i2iLogoTextOrange.png" alt="i2i Logo">
@@ -148,7 +145,6 @@
         <p>© 2024 i2i Amherst Venture Accelerator. All rights reserved.</p>
       </div>
     </footer>
-
   </main>
 
   <!-- AOS JS -->
@@ -170,9 +166,44 @@
       waveHeight: 30.00,
       zoom: 0.50
     });
+
+    // Dynamic Live Supabase Events Fetching
+    (function loadDynamicEvents() {
+      const SUPABASE_URL = "https://wkwevuetgoqglmkstarm.supabase.co";
+      const SUPABASE_ANON_KEY = "sb_publishable_emfb8JZAnTJFrwwKk_eE6A_l6dQFCOj";
+
+      fetch(`${SUPABASE_URL}/rest/v1/events?is_published=eq.true&select=*&order=event_date.desc`, {
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      })
+      .then(res => res.json())
+      .then(events => {
+        if (Array.isArray(events) && events.length > 0) {
+          const container = document.getElementById("team-cards");
+          events.forEach(ev => {
+            const card = document.createElement("div");
+            card.className = "team-card";
+            card.style.borderLeft = "4px solid #FF5722";
+
+            let timeText = ev.event_date || "";
+            if (ev.start_time) timeText += ` @ ${ev.start_time.substring(0, 5)}`;
+            if (ev.location) timeText += `, ${ev.location}`;
+
+            card.innerHTML = `
+              <p class="teamlead-time">🗓️ ${timeText}</p>
+              <h3 class="teamlead-title">${ev.title}</h3>
+              <p>${ev.description || ""}</p>
+              ${ev.registration_url ? `<p><a href="${ev.registration_url}" target="_blank" style="color:#FF5722; font-weight:bold;">Register Here ↗</a></p>` : ""}
+              ${ev.image_url ? `<div class="teamlead-info"><img src="${ev.image_url}" alt="${ev.title}"></div>` : ""}
+            `;
+            container.prepend(card);
+          });
+        }
+      })
+      .catch(err => console.warn("Could not load dynamic events from Supabase", err));
+    })();
   </script>
-
-
-
 </body>
 </html>
