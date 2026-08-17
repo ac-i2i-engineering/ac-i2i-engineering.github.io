@@ -65,7 +65,9 @@ export type MediaAttachedToType = "team_member" | "event" | "startup";
 
 export interface Media {
   id: string;
-  storage_path: string;
+  /** NULL for rows seeded from the repo's images/ directory — those files are
+   *  not in a Storage bucket. Set on upload via the Media Manager. */
+  storage_path: string | null;
   url: string;
   alt_text: string | null;
   caption: string | null;
