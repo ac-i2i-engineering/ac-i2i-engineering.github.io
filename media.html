@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Our Team - i2i Amherst Venture Accelerator</title>
+  <title>Media Gallery - i2i Amherst Venture Accelerator</title>
   <!-- Favicon -->
   <link rel="icon" href="images/logo-transparent.png">
   <!-- AOS CSS -->
@@ -14,6 +14,88 @@
   <link rel="stylesheet" href="css/style.css">
   <!-- Icon Social Media-->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      padding: 20px 0;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      aspect-ratio: 4/3;
+      cursor: pointer;
+      background: #f1f5f9;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .gallery-item:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 35px rgba(255, 87, 34, 0.25);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+    .gallery-item:hover img {
+      transform: scale(1.06);
+    }
+
+    /* Fullscreen Lightbox Modal */
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(8px);
+      z-index: 99999;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .lightbox-modal.active {
+      display: flex;
+      opacity: 1;
+    }
+    .lightbox-content {
+      max-width: 90vw;
+      max-height: 88vh;
+      border-radius: 12px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      object-fit: contain;
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+    }
+    .lightbox-modal.active .lightbox-content {
+      transform: scale(1);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 24px;
+      right: 32px;
+      color: #ffffff;
+      font-size: 36px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 100000;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+    .lightbox-close:hover {
+      color: #FF5722;
+      transform: scale(1.15);
+    }
+  </style>
 </head>
 <body>
 
@@ -36,31 +118,26 @@
   <main id="vanta-bg" class="main-content">
     <section class="hero">
       <div class="hero-text" data-aos="fade-right">
-        <h1 class="hero-title">Media</h1>
-        <p class="hero-description">Explore our impact and meet the team behind i2i through engaging visuals.</p>
+        <h1 class="hero-title">Media Gallery</h1>
+        <p class="hero-description">Moments, workshops, and memories captured at i2i.</p>
+      </div>
     </section>
 
-    <section id="team-info" class="info-sections">
-      <h2 class="section-title">Our Events</h2>
-      <p>
-        Explore opportunities to turn your ideas into reality through our workshops, pitch competitions, and networking sessions. At I2I, we provide the tools, mentorship, and community support you need to succeed and bring your vision to life!</p>
+    <section id="gallery-info" class="info-sections">
+      <h2 class="section-title">Photo Gallery</h2>
+      <p>Take a look at our past events, pitch sessions, and team collaborations. Click any image for full-screen view.</p>
 
-      <div id="team-cards">
-        <div class="gallery" id="media-gallery">
-            <!-- Gallery items will be dynamically loaded from media.json -->
-        </div>
-          
-          <!-- Modal Container -->
-          <div class="modal">
-            <span class="modal-close">&times;</span>
-            <img src="" alt="Enlarged image">
-          </div>
+      <div id="media-gallery" class="gallery"></div>
     </section>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox-modal" onclick="closeLightbox(event)">
+      <span class="lightbox-close" onclick="closeLightbox(event)">&times;</span>
+      <img id="lightbox-img" class="lightbox-content" src="" alt="Full Screen View">
+    </div>
 
     <footer class="footer">
-      
       <div class="footer-content">
-        
         <div class="footer-section">
           <a href = "/" class="footer-logo">
             <img src="images/i2iLogoTextOrange.png" alt="i2i Logo">
@@ -106,6 +183,91 @@
   <script src="js/app.js"></script>
   <script src="js/initAOS.js"></script>
   <script>
+    // Lightbox modal logic
+    function openLightbox(src) {
+      const modal = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      img.src = src;
+      modal.classList.add('active');
+    }
+
+    function closeLightbox(e) {
+      if (e.target.id === 'lightbox' || e.target.classList.contains('lightbox-close')) {
+        const modal = document.getElementById('lightbox');
+        modal.classList.remove('active');
+      }
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.getElementById('lightbox').classList.remove('active');
+      }
+    });
+
+    // 1. Load original gallery images from data/media.json
+    async function loadGallery() {
+      const gallery = document.getElementById('media-gallery');
+      gallery.innerHTML = "";
+
+      try {
+        const response = await fetch('data/media.json');
+        if (response.ok) {
+          const images = await response.json();
+          images.forEach((imagePath, index) => {
+            const galleryItem = document.createElement('div');
+            galleryItem.className = 'gallery-item';
+            galleryItem.style.order = index + 10;
+            galleryItem.onclick = () => openLightbox(imagePath);
+
+            const img = document.createElement('img');
+            img.src = imagePath;
+            img.alt = `Gallery Photo ${index + 1}`;
+
+            galleryItem.appendChild(img);
+            gallery.appendChild(galleryItem);
+          });
+        }
+      } catch (err) {}
+
+      // 2. Fetch and prepend new uploaded media items from Supabase
+      fetchNewSupabaseMedia();
+    }
+
+    async function fetchNewSupabaseMedia() {
+      const SUPABASE_URL = "https://wkwevuetgoqglmkstarm.supabase.co";
+      const SUPABASE_ANON_KEY = "sb_publishable_emfb8JZAnTJFrwwKk_eE6A_l6dQFCOj";
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/media?select=*&order=created_at.desc`, {
+          headers: {
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        });
+
+        const items = await response.json();
+        const gallery = document.getElementById('media-gallery');
+
+        if (Array.isArray(items) && items.length > 0) {
+          items.forEach((item, index) => {
+            const galleryItem = document.createElement('div');
+            galleryItem.className = 'gallery-item';
+            galleryItem.style.order = index + 1;
+            galleryItem.onclick = () => openLightbox(item.url);
+
+            const img = document.createElement('img');
+            img.src = item.url;
+            img.alt = item.alt_text || 'Uploaded Media';
+
+            galleryItem.appendChild(img);
+            gallery.prepend(galleryItem);
+          });
+        }
+      } catch (e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', loadGallery);
+
     VANTA.NET({
       el: "#vanta-bg",
       color: 0xff5722,
@@ -116,52 +278,6 @@
       waveHeight: 30.00,
       zoom: 0.50
     });
-
-    // Load gallery images from media.json
-    async function loadGallery() {
-      try {
-        const response = await fetch('data/media.json');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const images = await response.json();
-        const gallery = document.getElementById('media-gallery');
-        
-        // Create document fragment for batch DOM operations
-        const fragment = document.createDocumentFragment();
-        
-        images.forEach((imagePath, index) => {
-          // Create gallery item
-          const galleryItem = document.createElement('div');
-          galleryItem.className = 'gallery-item';
-          galleryItem.style.order = index + 1;
-          
-          // Create image element
-          const img = document.createElement('img');
-          img.src = imagePath;
-          
-          // Generate alt text from filename
-          const filename = imagePath.split('/').pop().replace('.jpg', '');
-          const altText = filename.replace(/([A-Z0-9])/g, ' $1').replace(/^\s*/, '').replace(/^\w/, c => c.toUpperCase());
-          img.alt = altText;
-          
-          // Add image to gallery item
-          galleryItem.appendChild(img);
-          
-          // Add gallery item to fragment (no DOM reflow)
-          fragment.appendChild(galleryItem);
-        });
-        
-        // Single DOM operation - append all items at once
-        gallery.appendChild(fragment);
-      } catch (error) {
-        console.error('Error loading gallery:', error);
-      }
-    }
-
-    // Load gallery when page loads
-    document.addEventListener('DOMContentLoaded', loadGallery);
   </script>
-
 </body>
 </html>

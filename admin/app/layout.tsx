@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "./providers";
+import { AdminLayout } from "@/components/AdminLayout";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,15 +15,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "i2i Admin",
+  title: "i2i Admin Panel",
   description: "Admin panel for the Ideas 2 Innovation website",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <AdminLayout>{children}</AdminLayout>
+        </Providers>
       </body>
     </html>
   );
