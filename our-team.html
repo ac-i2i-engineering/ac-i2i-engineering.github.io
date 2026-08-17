@@ -36,20 +36,20 @@
   <main id="vanta-bg" class="main-content">
     <section class="hero">
       <div class="hero-text" data-aos="fade-right">
-        <h1 class="hero-title">Looking for project, startup, or venture experience?</h1>
+        <h1 class="hero-title">Our Team</h1>
+        <p class="hero-description">The team behind i2i</p>
+      </div>
     </section>
 
     <section id="team-info" class="info-sections">
       <h2 class="section-title">Our Team</h2>
       <p>Four student teams capitalize on Amherst’s strengths. We've structured teams to <strong>accelerate learning and experiences</strong> for members, exposing them to various industries and projects.</p>
 
-            <div id="team-cards"></div>
+      <div id="team-cards"></div>
     </section>
 
     <footer class="footer">
-      
       <div class="footer-content">
-        
         <div class="footer-section">
           <a href = "/" class="footer-logo">
             <img src="images/i2iLogoTextOrange.png" alt="i2i Logo">
@@ -95,7 +95,7 @@
   <script src="js/app.js"></script>
   <script src="js/initAOS.js"></script>
   <script>
-    // Load team data from JSON
+    // 1. Render original team data from team.json first
     fetch('team.json')
       .then(response => response.json())
       .then(teams => {
@@ -106,7 +106,6 @@
           card.className = 'team-card';
           card.id = team.id;
 
-          // Create the main content
           const h3 = document.createElement('h3');
           h3.textContent = team.title;
           card.appendChild(h3);
@@ -119,7 +118,6 @@
           description.textContent = team.description;
           card.appendChild(description);
 
-          // Add link if it exists
           if (team.link) {
             const link = document.createElement('a');
             link.href = team.link.url;
@@ -127,15 +125,12 @@
             card.appendChild(link);
           }
 
-          // Create team lead info section
           const teamleadInfo = document.createElement('div');
           teamleadInfo.className = 'teamlead-info';
 
-          // Handle leaders (single or multiple)
-          if (team.leaders.length > 1) {
+          if (team.leaders && team.leaders.length > 1) {
             const leadersContainer = document.createElement('div');
             leadersContainer.className = `${team.id}-leaders`;
-            
             team.leaders.forEach((leader, index) => {
               const img = document.createElement('img');
               img.src = leader.image;
@@ -143,10 +138,8 @@
               img.className = `${team.id}-lead-${index}-img`;
               leadersContainer.appendChild(img);
             });
-            
             teamleadInfo.appendChild(leadersContainer);
-          } else {
-            // Single leader handling
+          } else if (team.leaders && team.leaders.length === 1) {
             const img = document.createElement('img');
             img.src = team.leaders[0].image;
             img.alt = team.leaders[0].alt;
@@ -154,30 +147,73 @@
             teamleadInfo.appendChild(img);
           }
 
-          // Add leader names (combine if multiple)
-          const nameP = document.createElement('p');
-          nameP.className = 'teamlead-name';
-          if (team.leaders.length > 1) {
-            nameP.textContent = team.leaders.map(leader => leader.name).join(' and ');
-          } else {
-            nameP.textContent = team.leaders[0].name;
-          }
-          teamleadInfo.appendChild(nameP);
+          if (team.leaders && team.leaders.length > 0) {
+            const nameP = document.createElement('p');
+            nameP.className = 'teamlead-name';
+            nameP.textContent = team.leaders.map(l => l.name).join(' and ');
+            teamleadInfo.appendChild(nameP);
 
-          // Add leader roles (use first role if multiple)
-          const roleP = document.createElement('p');
-          roleP.className = 'teamlead-role';
-          roleP.textContent = team.leaders[0].role;
-          teamleadInfo.appendChild(roleP);
+            const roleP = document.createElement('p');
+            roleP.className = 'teamlead-role';
+            roleP.textContent = team.leaders[0].role;
+            teamleadInfo.appendChild(roleP);
+          }
+
           card.appendChild(teamleadInfo);
           fragment.appendChild(card);
-          
         });
         container.appendChild(fragment);
+
+        // 2. Fetch and prepend new published members from Supabase live
+        fetchNewSupabaseMembers();
       })
-      .catch(error => {
-        console.error('Error loading team data:', error);
-      });
+      .catch(() => fetchNewSupabaseMembers());
+
+    function fetchNewSupabaseMembers() {
+      const SUPABASE_URL = "https://wkwevuetgoqglmkstarm.supabase.co";
+      const SUPABASE_ANON_KEY = "sb_publishable_emfb8JZAnTJFrwwKk_eE6A_l6dQFCOj";
+
+      fetch(`${SUPABASE_URL}/rest/v1/team_members?is_published=eq.true&select=*&order=created_at.desc`, {
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      })
+      .then(res => res.json())
+      .then(members => {
+        if (Array.isArray(members) && members.length > 0) {
+          const container = document.getElementById('team-cards');
+          members.forEach(member => {
+            const card = document.createElement('div');
+            card.className = 'team-card';
+            card.style.borderLeft = "4px solid #FF5722";
+
+            const h3 = document.createElement('h3');
+            h3.textContent = member.name;
+            card.appendChild(h3);
+
+            if (member.role) {
+              const subtitle = document.createElement('p');
+              subtitle.innerHTML = `<strong>${member.role}</strong>`;
+              card.appendChild(subtitle);
+            }
+
+            if (member.image_url) {
+              const teamleadInfo = document.createElement('div');
+              teamleadInfo.className = 'teamlead-info';
+              const img = document.createElement('img');
+              img.src = member.image_url;
+              img.alt = member.name;
+              teamleadInfo.appendChild(img);
+              card.appendChild(teamleadInfo);
+            }
+
+            container.prepend(card);
+          });
+        }
+      })
+      .catch(err => console.warn("Supabase fetch notice", err));
+    }
 
     VANTA.NET({
       el: "#vanta-bg",
@@ -190,6 +226,5 @@
       zoom: 0.50
     });
   </script>
-
 </body>
 </html>

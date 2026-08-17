@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>i2i Amherst Venture Accelerator</title>
+  <title>Startups - i2i Amherst Venture Accelerator</title>
   <!-- Favicon -->
-  <link rel="icon" href="images/i2iLogoFinalWhiteBG.png">
+  <link rel="icon" href="images/logo-transparent.png">
   <!-- AOS CSS -->
   <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css">
   <!-- Hamburger menu (bars) on small screens -->
@@ -36,41 +36,22 @@
   <main id="vanta-bg" class="main-content">
     <section class="hero">
       <div class="hero-text" data-aos="fade-right">
-        <h1 class="hero-title">If you had unlimited resources, what would you build?</h1>
-        <p class="hero-description">
-          We help launch and scale student ideas. Our mission is to apply Amherst’s rigorous academic learnings to generate solutions for real-world problems.
-        </p>
-        <div class="button-group">
-          <a href="https://docs.google.com/forms/d/e/1FAIpQLSfcrDwqZIOq7wLpO4vuEOESMXxsn3WWPRDyQtDrHBkZpSMz-g/viewform" target="_blank" id="instagram-btn" class="button">
-            Share your idea with us
-          </a>
-          <a href="#newsletter" id="newsletter-btn" class="button">
-            Join our newsletter
-          </a>
-        </div>
+        <h1 class="hero-title">Startups</h1>
+        <p class="hero-description">Innovations nurtured at i2i</p>
       </div>
     </section>
-    <section id="startups" class="info-sections">
-      <h2 class="section-title">Startups</h2>
-      <p>  Our mission is to provide students with the resources, connections, and direction to bring their ideas to life. </p>
 
-      <h2>Our Portfolio</h2>
-      <p>We are proud to present the startups that have been developed through the i2i Amherst Venture Accelerator.</p>
-      <p> We combine Amherst’s esteemed alumni network with the latent talent of our campus to establish the one-stop shop to build ideas that are:</p>
-      <ul class="orange-bullets">
-        <li>Big or Small</li>
-        <li>For-Profit or Non-Profit </li>
-        <li>Grand Plans or Shower Thoughts</li>
-      </ul>
-      <p><strong>If you have an idea or solution, we can help you build it!</strong></p>
-      </section>
-      <section id="index-info" class="info-sections">
-        <div id="startups-container"></div>
-      </section>
+    <section id="index-info" class="info-sections">
+      <h2 class="section-title">Incubated Startups</h2>
+      <p>
+        Explore the startups and projects built by our team members. From AI platforms to sustainability solutions, our teams create impact through real-world applications.
+      </p>
+
+      <div id="startups-container"></div>
+    </section>
+
     <footer class="footer">
-      
       <div class="footer-content">
-        
         <div class="footer-section">
           <a href = "/" class="footer-logo">
             <img src="images/i2iLogoTextOrange.png" alt="i2i Logo">
@@ -116,6 +97,7 @@
   <script src="js/app.js"></script>
   <script src="js/initAOS.js"></script>
   <script>
+    // 1. Render original startups from startups.json
     fetch('startups.json')
       .then(response => response.json())
       .then(startups => {
@@ -149,9 +131,65 @@
           card.appendChild(infoDiv);
           container.appendChild(card);
         });
-      });
-  </script>
-  <script>
+
+        // 2. Prepend any new published startups from Supabase live
+        fetchNewSupabaseStartups();
+      })
+      .catch(() => fetchNewSupabaseStartups());
+
+    function fetchNewSupabaseStartups() {
+      const SUPABASE_URL = "https://wkwevuetgoqglmkstarm.supabase.co";
+      const SUPABASE_ANON_KEY = "sb_publishable_emfb8JZAnTJFrwwKk_eE6A_l6dQFCOj";
+
+      fetch(`${SUPABASE_URL}/rest/v1/startups?is_published=eq.true&select=*&order=created_at.desc`, {
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      })
+      .then(res => res.json())
+      .then(startups => {
+        if (Array.isArray(startups) && startups.length > 0) {
+          const container = document.getElementById('startups-container');
+          startups.forEach(startup => {
+            const card = document.createElement('div');
+            card.className = 'index-card';
+            card.style.borderLeft = "4px solid #FF5722";
+
+            if (startup.image_url) {
+              const img = document.createElement('img');
+              img.src = startup.image_url;
+              img.alt = startup.title;
+              card.appendChild(img);
+            }
+
+            const infoDiv = document.createElement('div');
+
+            const h2 = document.createElement('h2');
+            h2.textContent = startup.title;
+            h2.className = 'team-lead';
+            infoDiv.appendChild(h2);
+
+            const p = document.createElement('p');
+            p.textContent = startup.description || "";
+            infoDiv.appendChild(p);
+
+            if (startup.github_url) {
+              const a = document.createElement('a');
+              a.href = startup.github_url;
+              a.target = "_blank";
+              a.textContent = startup.github_text || "GitHub Project Repository →";
+              infoDiv.appendChild(a);
+            }
+
+            card.appendChild(infoDiv);
+            container.prepend(card);
+          });
+        }
+      })
+      .catch(err => console.warn("Supabase fetch notice", err));
+    }
+
     VANTA.NET({
       el: "#vanta-bg",
       color: 0xff5722,
@@ -163,6 +201,5 @@
       zoom: 0.50
     });
   </script>
-
 </body>
 </html>

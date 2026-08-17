@@ -1,17 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-// Home dashboard stats — one function per stat card.
-// Owner: Database + API. Consumer: UI (Home page).
-//
-// Each card needs: total count, the most recent updated_at, and how many
-// rows were updated/created in the last 7 days. Events additionally needs
-// an "upcoming" count (is_published and event_date >= today).
-//
-// Implement using supabase-js `.select('*', { count: 'exact', head: true })`
-// for counts, `.order('updated_at', { ascending: false }).limit(1)` for the
-// most recent timestamp, and `.gte('updated_at', <7 days ago ISO string>)`
-// for the recent-activity count. See docs/SCHEMA.md for table/column names.
-
 export interface CardStats {
   total: number;
   updatedLast7Days: number;
@@ -22,26 +10,85 @@ export interface EventStats extends CardStats {
   upcoming: number;
 }
 
-export async function getTeamMemberStats(
+async function getGenericTableStats(
   supabase: SupabaseClient,
+  tableName: string
 ): Promise<CardStats> {
-  throw new Error("TODO: implement (see comment above)");
+  try {
+    const { count: totalCount, error: countErr } = await supabase
+      .from(tableName)
+      .select("*", { count: "exact", head: true });
+
+    if (countErr) throw countErr;
+
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const { count: recentCount } = await supabase
+      .from(tableName)
+      .select("*", { count: "exact", head: true })
+      .gte("updated_at", sevenDaysAgo);
+
+    const { data: latestRows } = await supabase
+      .from(tableName)
+      .select("updated_at")
+      .order("updated_at", { ascending: false })
+      .limit(1);
+
+    const lastUpdatedAt = latestRows && latestRows.length > 0 ? latestRows[0].updated_at : null;
+
+    return {
+      total: totalCount ?? 0,
+      updatedLast7Days: recentCount ?? 0,
+      lastUpdatedAt,
+    };
+  } catch (error) {
+    console.warn(`Could not fetch stats for ${tableName}, falling back to defaults`, error);
+    return {
+      total: 0,
+      updatedLast7Days: 0,
+      lastUpdatedAt: null,
+    };
+  }
+}
+
+export async function getTeamMemberStats(
+  supabase: SupabaseClient
+): Promise<CardStats> {
+  return getGenericTableStats(supabase, "team_members");
 }
 
 export async function getEventStats(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient
 ): Promise<EventStats> {
-  throw new Error("TODO: implement (see comment above)");
+  const baseStats = await getGenericTableStats(supabase, "events");
+  let upcoming = 0;
+
+  try {
+    const todayStr = new Date().toISOString().split("T")[0];
+    const { count } = await supabase
+      .from("events")
+      .select("*", { count: "exact", head: true })
+      .eq("is_published", true)
+      .gte("event_date", todayStr);
+
+    upcoming = count ?? 0;
+  } catch (e) {
+    console.warn("Could not fetch upcoming event stats", e);
+  }
+
+  return {
+    ...baseStats,
+    upcoming,
+  };
 }
 
 export async function getStartupStats(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient
 ): Promise<CardStats> {
-  throw new Error("TODO: implement (see comment above)");
+  return getGenericTableStats(supabase, "startups");
 }
 
 export async function getMediaStats(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient
 ): Promise<CardStats> {
-  throw new Error("TODO: implement (see comment above)");
+  return getGenericTableStats(supabase, "media");
 }
