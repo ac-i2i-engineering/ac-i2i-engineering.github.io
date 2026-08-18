@@ -4,7 +4,8 @@
 
 Welcome to the repository of Ideas 2 Innovation website! This repo holds three
 independently deployed pieces — see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
-for how they fit together, and [`docs/SCHEMA.md`](docs/SCHEMA.md) for the database.
+for how they fit together, [`docs/SCHEMA.md`](docs/SCHEMA.md) for the database,
+and [`docs/AUTH.md`](docs/AUTH.md) for admin roles/authentication.
 
 **Quickstart:** [`docs/LOCAL_DEVELOPMENT.md`](docs/LOCAL_DEVELOPMENT.md) to run
 everything locally, [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) to ship it.

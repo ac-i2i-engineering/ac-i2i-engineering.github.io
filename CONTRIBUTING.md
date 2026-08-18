@@ -72,3 +72,9 @@ history still has it until it's rotated.
 RLS policies are the actual access-control boundary, not the admin UI —
 if you add or change a policy, verify it with a real anon (logged-out)
 request, not just by clicking around while signed in as an admin.
+
+Admin-user management (invite/suspend/reactivate/delete) is authorized in
+application code, not RLS — `admin_users` has no client-write policy at
+all, on purpose. See [`docs/AUTH.md`](docs/AUTH.md) before adding a new
+action here; the pattern is always "read the caller's own role via
+`getAdminSession()`, never trust a role/permission claimed in the request."
