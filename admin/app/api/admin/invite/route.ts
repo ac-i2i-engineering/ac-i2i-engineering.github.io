@@ -25,17 +25,20 @@ export async function POST(request: Request) {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    let authUser = null;
-    try {
-      const { data: authData, error: authErr } = await supabaseAdmin.auth.admin.inviteUserByEmail(email);
-      if (!authErr && authData?.user) {
-        authUser = authData.user;
-      }
-    } catch (e) {
-      console.warn("Supabase Auth invite skipped:", e);
+    // admin_users.id is a PK that references auth.users(id) with no default,
+    // so it must come from a real Auth user -- inviteUserByEmail must
+    // succeed before there's anything to insert.
+    const { data: authData, error: authErr } = await supabaseAdmin.auth.admin.inviteUserByEmail(email);
+    if (authErr || !authData?.user) {
+      return NextResponse.json(
+        { error: `Failed to invite user via Supabase Auth: ${authErr?.message || "no user returned"}` },
+        { status: 500 },
+      );
     }
+    const authUser = authData.user;
 
     const newUser = {
+      id: authUser.id,
       email,
       full_name: fullName || email.split("@")[0],
       role: role || "admin",
@@ -55,10 +58,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       message: `Invitation successfully sent and recorded for ${email}`,
-      user: {
-        id: authUser?.id ?? inserted.id,
-        ...newUser,
-      },
+      user: inserted,
     });
   } catch (err: any) {
     console.error("Invite API error:", err);

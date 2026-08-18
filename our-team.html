@@ -151,6 +151,7 @@
             const leadersContainer = document.createElement('div');
             leadersContainer.className = `${team.slug}-leaders`;
             members.forEach((member, index) => {
+              if (!member.image_url) return;
               const img = document.createElement('img');
               img.src = member.image_url;
               img.alt = member.alt_text || member.name;
@@ -158,7 +159,7 @@
               leadersContainer.appendChild(img);
             });
             teamleadInfo.appendChild(leadersContainer);
-          } else {
+          } else if (members[0].image_url) {
             const img = document.createElement('img');
             img.src = members[0].image_url;
             img.alt = members[0].alt_text || members[0].name;
