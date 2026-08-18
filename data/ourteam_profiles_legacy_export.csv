@@ -1,0 +1,21 @@
+name,image_path,role,suggested_department_slug,suggested_is_lead
+Yubo Cao,images/Profiles/Yubo.jpg,Co-president,executive,true
+Katie Chen,images/Profiles/katie.png,Co-president,executive,true
+Minh Nguyen,images/Profiles/Minh.jpg,Co-vice President,executive,true
+Brian Zhou,images/Profiles/placeholder.jpg,Co-vice president,executive,true
+Vishva Patel,images/Profiles/Vishva.jpg,Chief of Fundraising,executive,true
+Elizabeth Tsiporkin,images/Profiles/Elizabeth.jpg,Chief of Fundraising,executive,true
+Max Lee,images/Profiles/max.jpg,Head of Marketing/Advertising,executive,true
+Kevin Juwang Lee,images/Profiles/placeholder.jpg,Competition Head,competition,true
+James Overcash,images/Profiles/placeholder.jpg,Algo Head,algo,true
+Luke Cheng,images/Profiles/placeholder.jpg,Algo Officer,algo,false
+Edmund Fung,images/Profiles/Edmund.jpg,Algo Officer,algo,false
+Jase George,images/Profiles/placeholder.jpg,CyberDragons Head,cyberdragons,true
+BanAnh Doan,images/Profiles/placeholder.jpg,CyberDragons Officer,cyberdragons,false
+Jackie Lu,images/Profiles/Jackie.jpg,CyberDragons Officer,cyberdragons,false
+Achilleas Galanis,images/Profiles/Achilleas.jpg,CyberDragons Officer,cyberdragons,false
+Nekita Ghimire,images/Profiles/placeholder.jpg,CS 101 Head,cs101,true
+Zoe Lee,images/Profiles/placeholder.jpg,CS 101 Officer,cs101,false
+Ann Padamadan,images/Profiles/placeholder.jpg,CS 101 Officer,cs101,false
+Ishaan Patel,images/Profiles/placeholder.jpg,CS 101 Officer,cs101,false
+Minju Suh,images/Profiles/placeholder.jpg,CS 101 Officer,cs101,false

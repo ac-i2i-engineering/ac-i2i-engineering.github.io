@@ -11,6 +11,12 @@ at that URL, with `CNAME` pointing the custom domain
 files (`*.html`, `css/`, `js/`, `images/`, `*.json`) goes live within a
 minute or two — no build step, no Action required.
 
+The public site's Supabase URL and anon key live directly in `js/supabase-client.js`,
+not an environment variable — there's no build step to inject one into. That's
+expected (the anon key is meant to be public either way), but it means
+rotating the anon key requires editing that file and pushing to `main`,
+unlike the admin panel where it's a Vercel env var.
+
 ## Database/Auth/Storage — Supabase
 
 One-time setup (already done: the `i2i-website` project exists):

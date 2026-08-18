@@ -23,6 +23,12 @@ Branch off `main`, open a PR into `main` when ready.
   suppress them.
 - Prefer Chakra UI components over hand-written CSS in `admin/`.
 - No commented-out code or leftover debug logging in a PR.
+- On the public site, always use the shared `supabaseClient` from
+  `js/supabase-client.js` (include the SDK CDN script + that file, same as
+  `our-team.html`/`startups.html`/`media.html` do) — never hand-build a
+  `fetch()` call to the Supabase REST API or redeclare the URL/anon key in a
+  page's own script. Redeclaring it per-page is exactly how the site ended up
+  double-rendering every startup and media item for a while.
 
 ## Testing / QA
 
