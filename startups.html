@@ -93,24 +93,37 @@
   <!-- Vanta JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3/dist/umd/supabase.js"></script>
+  <script src="js/supabase-client.js"></script>
   <!-- Custom JS -->
   <script src="js/app.js"></script>
   <script src="js/initAOS.js"></script>
   <script>
-    // 1. Render original startups from startups.json
-    fetch('startups.json')
-      .then(response => response.json())
-      .then(startups => {
+    // Startups are managed in the admin panel and read live from Supabase --
+    // this is the single source of truth, no local JSON fallback.
+    supabaseClient
+      .from('startups')
+      .select('*')
+      .eq('is_published', true)
+      .order('sort_order', { ascending: true })
+      .then(({ data: startups, error }) => {
+        if (error) {
+          console.warn("Failed to load startups", error);
+          return;
+        }
         const container = document.getElementById('startups-container');
         startups.forEach(startup => {
           const card = document.createElement('div');
           card.className = 'index-card';
-          card.id = startup.id;
+          card.id = startup.slug;
 
-          const img = document.createElement('img');
-          img.src = startup.image;
-          img.alt = startup.alt;
-          card.appendChild(img);
+          if (startup.image_url) {
+            const img = document.createElement('img');
+            img.src = startup.image_url;
+            img.alt = startup.image_alt || startup.title;
+            card.appendChild(img);
+          }
 
           const infoDiv = document.createElement('div');
 
@@ -120,75 +133,21 @@
           infoDiv.appendChild(h2);
 
           const p = document.createElement('p');
-          p.textContent = startup.description;
+          p.textContent = startup.description || "";
           infoDiv.appendChild(p);
 
-          const a = document.createElement('a');
-          a.href = startup.github_url;
-          a.textContent = startup.github_text;
-          infoDiv.appendChild(a);
+          if (startup.github_url) {
+            const a = document.createElement('a');
+            a.href = startup.github_url;
+            a.textContent = startup.github_text || "GitHub Project Repository→";
+            infoDiv.appendChild(a);
+          }
 
           card.appendChild(infoDiv);
           container.appendChild(card);
         });
-
-        // 2. Prepend any new published startups from Supabase live
-        fetchNewSupabaseStartups();
       })
-      .catch(() => fetchNewSupabaseStartups());
-
-    function fetchNewSupabaseStartups() {
-      const SUPABASE_URL = "https://wkwevuetgoqglmkstarm.supabase.co";
-      const SUPABASE_ANON_KEY = "sb_publishable_emfb8JZAnTJFrwwKk_eE6A_l6dQFCOj";
-
-      fetch(`${SUPABASE_URL}/rest/v1/startups?is_published=eq.true&select=*&order=created_at.desc`, {
-        headers: {
-          "apikey": SUPABASE_ANON_KEY,
-          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
-        }
-      })
-      .then(res => res.json())
-      .then(startups => {
-        if (Array.isArray(startups) && startups.length > 0) {
-          const container = document.getElementById('startups-container');
-          startups.forEach(startup => {
-            const card = document.createElement('div');
-            card.className = 'index-card';
-            card.style.borderLeft = "4px solid #FF5722";
-
-            if (startup.image_url) {
-              const img = document.createElement('img');
-              img.src = startup.image_url;
-              img.alt = startup.title;
-              card.appendChild(img);
-            }
-
-            const infoDiv = document.createElement('div');
-
-            const h2 = document.createElement('h2');
-            h2.textContent = startup.title;
-            h2.className = 'team-lead';
-            infoDiv.appendChild(h2);
-
-            const p = document.createElement('p');
-            p.textContent = startup.description || "";
-            infoDiv.appendChild(p);
-
-            if (startup.github_url) {
-              const a = document.createElement('a');
-              a.href = startup.github_url;
-              a.target = "_blank";
-              a.textContent = startup.github_text || "GitHub Project Repository →";
-              infoDiv.appendChild(a);
-            }
-
-            card.appendChild(infoDiv);
-            container.prepend(card);
-          });
-        }
-      })
-      .catch(err => console.warn("Supabase fetch notice", err));
-    }
+      .catch(err => console.warn("Unexpected error loading startups", err));
 
     VANTA.NET({
       el: "#vanta-bg",

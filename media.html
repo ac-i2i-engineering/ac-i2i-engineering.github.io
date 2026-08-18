@@ -179,6 +179,9 @@
   <!-- Vanta JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3/dist/umd/supabase.js"></script>
+  <script src="js/supabase-client.js"></script>
   <!-- Custom JS -->
   <script src="js/app.js"></script>
   <script src="js/initAOS.js"></script>
@@ -204,66 +207,36 @@
       }
     });
 
-    // 1. Load original gallery images from data/media.json
+    // Media is managed in the admin panel and read live from Supabase --
+    // this is the single source of truth, no local JSON fallback.
     async function loadGallery() {
       const gallery = document.getElementById('media-gallery');
       gallery.innerHTML = "";
 
       try {
-        const response = await fetch('data/media.json');
-        if (response.ok) {
-          const images = await response.json();
-          images.forEach((imagePath, index) => {
-            const galleryItem = document.createElement('div');
-            galleryItem.className = 'gallery-item';
-            galleryItem.style.order = index + 10;
-            galleryItem.onclick = () => openLightbox(imagePath);
+        const { data: items, error } = await supabaseClient
+          .from('media')
+          .select('*')
+          .order('sort_order', { ascending: true });
 
-            const img = document.createElement('img');
-            img.src = imagePath;
-            img.alt = `Gallery Photo ${index + 1}`;
+        if (error) throw error;
 
-            galleryItem.appendChild(img);
-            gallery.appendChild(galleryItem);
-          });
-        }
-      } catch (err) {}
+        items.forEach((item, index) => {
+          const galleryItem = document.createElement('div');
+          galleryItem.className = 'gallery-item';
+          galleryItem.style.order = index;
+          galleryItem.onclick = () => openLightbox(item.url);
 
-      // 2. Fetch and prepend new uploaded media items from Supabase
-      fetchNewSupabaseMedia();
-    }
+          const img = document.createElement('img');
+          img.src = item.url;
+          img.alt = item.alt_text || `Gallery Photo ${index + 1}`;
 
-    async function fetchNewSupabaseMedia() {
-      const SUPABASE_URL = "https://wkwevuetgoqglmkstarm.supabase.co";
-      const SUPABASE_ANON_KEY = "sb_publishable_emfb8JZAnTJFrwwKk_eE6A_l6dQFCOj";
-
-      try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/media?select=*&order=created_at.desc`, {
-          headers: {
-            "apikey": SUPABASE_ANON_KEY,
-            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
-          }
+          galleryItem.appendChild(img);
+          gallery.appendChild(galleryItem);
         });
-
-        const items = await response.json();
-        const gallery = document.getElementById('media-gallery');
-
-        if (Array.isArray(items) && items.length > 0) {
-          items.forEach((item, index) => {
-            const galleryItem = document.createElement('div');
-            galleryItem.className = 'gallery-item';
-            galleryItem.style.order = index + 1;
-            galleryItem.onclick = () => openLightbox(item.url);
-
-            const img = document.createElement('img');
-            img.src = item.url;
-            img.alt = item.alt_text || 'Uploaded Media';
-
-            galleryItem.appendChild(img);
-            gallery.prepend(galleryItem);
-          });
-        }
-      } catch (e) {}
+      } catch (err) {
+        console.warn("Failed to load media gallery", err);
+      }
     }
 
     document.addEventListener('DOMContentLoaded', loadGallery);

@@ -91,129 +91,97 @@
   <!-- Vanta JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3/dist/umd/supabase.js"></script>
+  <script src="js/supabase-client.js"></script>
   <!-- Custom JS -->
   <script src="js/app.js"></script>
   <script src="js/initAOS.js"></script>
   <script>
-    // 1. Render original team data from team.json first
-    fetch('team.json')
-      .then(response => response.json())
-      .then(teams => {
+    // Team is managed in the admin panel and read live from Supabase --
+    // departments with their published members embedded in one request.
+    supabaseClient
+      .from('team_departments')
+      .select('*, team_members(*)')
+      .eq('team_members.is_published', true)
+      .order('sort_order', { ascending: true })
+      .order('sort_order', { ascending: true, referencedTable: 'team_members' })
+      .then(({ data: teams, error }) => {
+        if (error) {
+          console.warn("Failed to load team", error);
+          return;
+        }
         const container = document.getElementById('team-cards');
         const fragment = document.createDocumentFragment();
         teams.forEach(team => {
+          const members = team.team_members || [];
+          if (members.length === 0) return;
+
           const card = document.createElement('div');
           card.className = 'team-card';
-          card.id = team.id;
+          card.id = team.slug;
 
           const h3 = document.createElement('h3');
           h3.textContent = team.title;
           card.appendChild(h3);
 
-          const subtitle = document.createElement('p');
-          subtitle.innerHTML = `<strong>${team.subtitle}</strong>`;
-          card.appendChild(subtitle);
+          if (team.subtitle) {
+            const subtitle = document.createElement('p');
+            subtitle.innerHTML = `<strong>${team.subtitle}</strong>`;
+            card.appendChild(subtitle);
+          }
 
-          const description = document.createElement('p');
-          description.textContent = team.description;
-          card.appendChild(description);
+          if (team.description) {
+            const description = document.createElement('p');
+            description.textContent = team.description;
+            card.appendChild(description);
+          }
 
-          if (team.link) {
+          if (team.link_url) {
             const link = document.createElement('a');
-            link.href = team.link.url;
-            link.textContent = team.link.text;
+            link.href = team.link_url;
+            link.textContent = team.link_text || "Learn more →";
             card.appendChild(link);
           }
 
           const teamleadInfo = document.createElement('div');
           teamleadInfo.className = 'teamlead-info';
 
-          if (team.leaders && team.leaders.length > 1) {
+          if (members.length > 1) {
             const leadersContainer = document.createElement('div');
-            leadersContainer.className = `${team.id}-leaders`;
-            team.leaders.forEach((leader, index) => {
+            leadersContainer.className = `${team.slug}-leaders`;
+            members.forEach((member, index) => {
               const img = document.createElement('img');
-              img.src = leader.image;
-              img.alt = leader.alt;
-              img.className = `${team.id}-lead-${index}-img`;
+              img.src = member.image_url;
+              img.alt = member.alt_text || member.name;
+              img.className = `${team.slug}-lead-${index}-img`;
               leadersContainer.appendChild(img);
             });
             teamleadInfo.appendChild(leadersContainer);
-          } else if (team.leaders && team.leaders.length === 1) {
+          } else {
             const img = document.createElement('img');
-            img.src = team.leaders[0].image;
-            img.alt = team.leaders[0].alt;
-            img.className = `${team.id}-lead-img`;
+            img.src = members[0].image_url;
+            img.alt = members[0].alt_text || members[0].name;
+            img.className = `${team.slug}-lead-img`;
             teamleadInfo.appendChild(img);
           }
 
-          if (team.leaders && team.leaders.length > 0) {
-            const nameP = document.createElement('p');
-            nameP.className = 'teamlead-name';
-            nameP.textContent = team.leaders.map(l => l.name).join(' and ');
-            teamleadInfo.appendChild(nameP);
+          const nameP = document.createElement('p');
+          nameP.className = 'teamlead-name';
+          nameP.textContent = members.map(m => m.name).join(' and ');
+          teamleadInfo.appendChild(nameP);
 
-            const roleP = document.createElement('p');
-            roleP.className = 'teamlead-role';
-            roleP.textContent = team.leaders[0].role;
-            teamleadInfo.appendChild(roleP);
-          }
+          const roleP = document.createElement('p');
+          roleP.className = 'teamlead-role';
+          roleP.textContent = members[0].role || '';
+          teamleadInfo.appendChild(roleP);
 
           card.appendChild(teamleadInfo);
           fragment.appendChild(card);
         });
         container.appendChild(fragment);
-
-        // 2. Fetch and prepend new published members from Supabase live
-        fetchNewSupabaseMembers();
       })
-      .catch(() => fetchNewSupabaseMembers());
-
-    function fetchNewSupabaseMembers() {
-      const SUPABASE_URL = "https://wkwevuetgoqglmkstarm.supabase.co";
-      const SUPABASE_ANON_KEY = "sb_publishable_emfb8JZAnTJFrwwKk_eE6A_l6dQFCOj";
-
-      fetch(`${SUPABASE_URL}/rest/v1/team_members?is_published=eq.true&select=*&order=created_at.desc`, {
-        headers: {
-          "apikey": SUPABASE_ANON_KEY,
-          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
-        }
-      })
-      .then(res => res.json())
-      .then(members => {
-        if (Array.isArray(members) && members.length > 0) {
-          const container = document.getElementById('team-cards');
-          members.forEach(member => {
-            const card = document.createElement('div');
-            card.className = 'team-card';
-            card.style.borderLeft = "4px solid #FF5722";
-
-            const h3 = document.createElement('h3');
-            h3.textContent = member.name;
-            card.appendChild(h3);
-
-            if (member.role) {
-              const subtitle = document.createElement('p');
-              subtitle.innerHTML = `<strong>${member.role}</strong>`;
-              card.appendChild(subtitle);
-            }
-
-            if (member.image_url) {
-              const teamleadInfo = document.createElement('div');
-              teamleadInfo.className = 'teamlead-info';
-              const img = document.createElement('img');
-              img.src = member.image_url;
-              img.alt = member.name;
-              teamleadInfo.appendChild(img);
-              card.appendChild(teamleadInfo);
-            }
-
-            container.prepend(card);
-          });
-        }
-      })
-      .catch(err => console.warn("Supabase fetch notice", err));
-    }
+      .catch(err => console.warn("Unexpected error loading team", err));
 
     VANTA.NET({
       el: "#vanta-bg",
