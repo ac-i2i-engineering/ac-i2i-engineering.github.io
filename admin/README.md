@@ -32,9 +32,12 @@ node scripts/bootstrap-owner.mjs "you@example.com"
   Authorization happens here, in application code, not via RLS — see
   `docs/AUTH.md#where-authorization-is-actually-enforced`.
 - `proxy.ts` (repo root of `admin/`) — Next.js 16's renamed `middleware.ts`.
-  Refreshes the session cookie every request and does the coarse
-  authenticated/not-authenticated redirect; the real per-page check is
-  `getAdminSession()`.
+  Refreshes the session cookie every request and redirects requests with no
+  Supabase session away from protected routes. Deliberately does not
+  redirect an authenticated user away from `/login` — that page does its
+  own `getAdminSession()` check, since "has a session" isn't the same as
+  "is an active admin" and conflating the two caused an infinite redirect
+  loop for a suspended admin.
 - `lib/auth/session.ts` — `getAdminSession()` (server-only) and `isOwner()`.
   The single source of truth for "is this caller a real, active admin, and
   are they an Owner" — used by both `(protected)/layout.tsx` and every
