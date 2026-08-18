@@ -90,11 +90,16 @@ policy as though it hides something.
 ## Seed data
 
 [`0005_seed_initial_content.sql`](../supabase/migrations/0005_seed_initial_content.sql)
-loads the site's committed JSON: `team.json` → 4 departments + 5 members,
-`startups.json` → 6 startups, `data/media.json` → 21 media rows. Image paths
-stay as `images/...` (served from GitHub Pages); nothing is in Storage yet, so
-those `media` rows carry `storage_path = NULL`. Every insert is
-`on conflict … do nothing`, so re-running it is a no-op.
+loads the site's committed JSON (now legacy, no longer read by any page —
+see `docs/ARCHITECTURE.md`): `team.json` → 4 departments + 5 members,
+`startups.json` → 6 startups, `data/media.json` → 21 media rows. `0005` wrote
+image paths as bare `images/...`, which 
+[`0007_fix_legacy_image_urls.sql`](../supabase/migrations/0007_fix_legacy_image_urls.sql)
+absolutized to `https://acideas2innovation.com/images/...` — a relative path
+only resolves against the public site's own origin, and the admin panel is a
+different origin. Nothing is in Storage yet, so those `media` rows still
+carry `storage_path = NULL`. Every insert in `0005` is `on conflict … do
+nothing`, so re-running it is a no-op.
 
 Two field renames to watch, since the JSON and the schema disagree:
 `startups.json` `test_url`/`test_text` map to `demo_url`/`demo_text`, and its

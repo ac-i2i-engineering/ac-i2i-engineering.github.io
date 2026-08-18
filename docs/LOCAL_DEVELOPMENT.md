@@ -12,8 +12,12 @@ npx serve .          # from the repo root, then open the printed localhost URL
 ```
 
 Opening the HTML files directly (`file://...`) mostly works too, but some
-browsers block `fetch()` against local files under `file://`, which is how
-these pages load their data — `npx serve .` avoids that.
+browsers restrict pages loaded that way — `npx serve .` avoids that.
+
+Team, Startups, and Media all fetch live from the shared Supabase project
+(via `js/supabase-client.js`) rather than from a local JSON file, so you need
+an internet connection for those pages to show data even when running fully
+locally — there's no offline/local-only fallback.
 
 ## 2. Admin panel
 

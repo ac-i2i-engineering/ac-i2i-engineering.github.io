@@ -23,8 +23,17 @@ everything locally, [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) to ship it.
 - `app.js` contains JavaScript related to the entire website
 - `initAOS.js` is used to configure scroll animations
 - `vanilla-tilt.js` is a third-party library
+- `supabase-client.js` creates the one shared Supabase client (`supabaseClient`)
+  every data-driven page uses — see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+  Always reuse this client rather than hardcoding the Supabase URL/key again
+  in a page's own `<script>` block.
 
 `images/` - Contains images for the website
+
+`team.json`, `startups.json`, `data/media.json` - **Legacy.** No page reads
+these anymore; Team, Startups, and Media all fetch live from Supabase via
+`js/supabase-client.js`. Kept only as the historical source the initial
+database seed was generated from.
 
 All of the `HTML` files are located in the root directory.
 

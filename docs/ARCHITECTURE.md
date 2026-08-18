@@ -21,19 +21,23 @@ talk to Supabase directly:
   `admin_users` allowlist table). A couple of privileged operations (managing
   `admin_users` itself) go through a Next.js Route Handler using the
   `service_role` key, since those tables have no client-write RLS policy at all.
-- **Public site** fetches from Supabase's auto-generated REST API (PostgREST)
-  with the anon key, the same way it currently does `fetch('team.json')` /
-  `fetch('startups.json')` / `fetch('data/media.json')` — just pointed at
-  Supabase instead of a local file.
+- **Public site** fetches from Supabase at page-load time using the official
+  `@supabase/supabase-js` SDK (loaded via CDN, no build step) through one
+  shared client, `js/supabase-client.js`, included on every data-driven page.
+  `our-team.html`, `startups.html`, and `media.html` all call
+  `supabaseClient.from(...).select(...)` the same way the admin panel does —
+  same SDK, same mental model, both places. `team.json`, `startups.json`, and
+  `data/media.json` at the repo root are no longer read by any page; they're
+  kept only as the historical source the initial Supabase seed
+  (`supabase/migrations/0005_seed_initial_content.sql`) was generated from.
 
 ## Why this stack choice? "instant updates"
 
-The public site already fetches its data at page-load time rather than having
-it baked in at build time (see `our-team.html`, `startups.html`, `media.html`).
-Moving the source of truth from a committed JSON file to a Postgres table
-doesn't change that pattern — it just means the admin panel's `INSERT`/`UPDATE`
-lands in the same table the public site queries on next page load. No rebuild,
-no redeploy, no cache-busting step required.
+The public site fetches its data at page-load time rather than having it
+baked in at build time. Moving the source of truth from a committed JSON file
+to a Postgres table doesn't change that pattern — it just means the admin
+panel's `INSERT`/`UPDATE` lands in the same table the public site queries on
+next page load. No rebuild, no redeploy, no cache-busting step required.
 
 ## Data flow
 
