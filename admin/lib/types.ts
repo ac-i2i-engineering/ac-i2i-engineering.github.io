@@ -78,11 +78,15 @@ export interface Media {
   updated_at: string;
 }
 
+export type AdminRole = "owner" | "admin";
+export type AdminStatus = "active" | "suspended";
+
 export interface AdminUser {
   id: string;
   email: string;
   full_name: string | null;
-  role: string;
+  role: AdminRole;
+  status: AdminStatus;
   created_at: string;
 }
 

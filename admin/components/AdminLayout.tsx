@@ -1,9 +1,27 @@
 "use client";
 
-import { Box, Flex, Text, Avatar, Badge } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
+import { Box, Flex, Text, Avatar, Badge, Button } from "@chakra-ui/react";
 import { Sidebar } from "./Sidebar";
+import { createClient } from "@/lib/supabase/client";
+import type { AdminUser } from "@/lib/types";
 
-export function AdminLayout({ children }: { children: React.ReactNode }) {
+interface AdminLayoutProps {
+  children: React.ReactNode;
+  user: { email: string; admin: AdminUser };
+}
+
+export function AdminLayout({ children, user }: AdminLayoutProps) {
+  const router = useRouter();
+  const displayName = user.admin.full_name || user.email;
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
+
   return (
     <Flex minH="100vh" bg="#0B0F19" color="gray.100">
       <Sidebar />
@@ -34,16 +52,31 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
           <Flex align="center" gap={4}>
             <Box textStyle="sm" textAlign="right">
-              <Text fontWeight="semibold" color="gray.200" fontSize="sm">
-                Simon Iradukunda
-              </Text>
+              <Flex align="center" gap={2} justify="flex-end">
+                <Text fontWeight="semibold" color="gray.200" fontSize="sm">
+                  {displayName}
+                </Text>
+                <Badge
+                  bg={user.admin.role === "owner" ? "rgba(251, 191, 36, 0.15)" : "rgba(99, 102, 241, 0.15)"}
+                  color={user.admin.role === "owner" ? "#FBBF24" : "#818CF8"}
+                  fontSize="9px"
+                  px={1.5}
+                  borderRadius="sm"
+                  textTransform="uppercase"
+                >
+                  {user.admin.role}
+                </Badge>
+              </Flex>
               <Text fontSize="xs" color="gray.400">
-                admin@i2i-engineering.org
+                {user.email}
               </Text>
             </Box>
             <Avatar.Root size="md" border="2px solid rgba(99, 102, 241, 0.5)">
-              <Avatar.Fallback name="Simon Iradukunda" bg="indigo.600" color="white" fontWeight="bold" />
+              <Avatar.Fallback name={displayName} bg="indigo.600" color="white" fontWeight="bold" />
             </Avatar.Root>
+            <Button size="sm" variant="ghost" color="gray.400" onClick={handleSignOut}>
+              Sign out
+            </Button>
           </Flex>
         </Flex>
 

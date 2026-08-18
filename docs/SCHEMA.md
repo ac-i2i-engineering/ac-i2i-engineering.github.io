@@ -3,7 +3,8 @@
 Source of truth: everything in [`supabase/migrations/`](../supabase/migrations),
 applied in order — `0001` tables/triggers/`is_admin()`, `0002` Storage buckets,
 `0003` RLS policies, `0004` Storage policies, `0005` seed data, `0006` dashboard
-stats RPC. TypeScript mirror: [`admin/lib/types.ts`](../admin/lib/types.ts).
+stats RPC, `0007`–`0008` image URL fixes, `0009` Owner/Admin roles + `is_owner()`.
+TypeScript mirror: [`admin/lib/types.ts`](../admin/lib/types.ts).
 
 If you change a column, update the migration, `lib/types.ts`, and this table
 in the same PR — the public site and the admin panel both depend on these
@@ -18,12 +19,18 @@ names matching exactly.
 | `events` | Calendar events | published rows | yes |
 | `startups` | Projects/Startups showcase | published rows | yes |
 | `media` | Uploaded images, optionally attached to a team member/event/startup | all rows | yes |
-| `admin_users` | Allowlist of who can sign in to `/admin` and write data | admin-only | **no** — service_role only |
+| `admin_users` | Allowlist of who can sign in to `/admin` and write data. `role` is `owner` \| `admin`; `status` is `active` \| `suspended` (`0009`) | admin-only | **no** — service_role only |
 | `activity_logs` | Audit trail of content changes (optional/stretch) | admin-only | **no** — service_role only |
 
 "Admin write" is enforced by RLS via the `is_admin()` helper function, which
-checks whether `auth.uid()` exists in `admin_users`. There is no other gate —
-whoever has a row in `admin_users` can write to every content table.
+checks `auth.uid()` exists in `admin_users` **and** `status = 'active'`
+(`0009`) — a suspended admin loses write access the instant their row is
+updated, no session invalidation required. There is no other gate —
+whoever has an active row in `admin_users` can write to every content
+table. `is_owner()` (also `0009`) additionally requires `role = 'owner'`,
+used to gate admin-user management — see [`docs/AUTH.md`](AUTH.md) for the
+full Owner/Admin design and why that's enforced in application code rather
+than another RLS policy.
 
 ## Row Level Security
 

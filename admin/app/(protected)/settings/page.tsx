@@ -15,24 +15,29 @@ import {
 } from "@chakra-ui/react";
 import { DataTable, ColumnDef } from "@/components/ui/DataTable";
 import { ModalFormWrapper } from "@/components/ui/ModalFormWrapper";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { createClient } from "@/lib/supabase/client";
+import { useAdminSession } from "@/lib/auth/SessionContext";
 import { relativeTime } from "@/lib/utils/relativeTime";
 import type { AdminUser } from "@/lib/types";
 
 export default function SettingsPage() {
+  const session = useAdminSession();
+  const isOwner = session.admin.role === "owner";
+
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState("admin");
+  const [inviteRole, setInviteRole] = useState<"admin" | "owner">("admin");
   const [inviteFullName, setInviteFullName] = useState("");
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  useEffect(() => {
-    fetchAdminUsers();
-  }, []);
+  const [statusTarget, setStatusTarget] = useState<AdminUser | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
   async function fetchAdminUsers() {
     setLoading(true);
@@ -44,32 +49,17 @@ export default function SettingsPage() {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (data && data.length > 0) {
-        setAdminUsers(data);
-      } else {
-        setAdminUsers([
-          {
-            id: "u1",
-            email: "admin@i2i-engineering.org",
-            full_name: "Simon Iradukunda",
-            role: "Super Admin",
-            created_at: new Date(Date.now() - 30 * 86400000).toISOString(),
-          },
-          {
-            id: "u2",
-            email: "reza@i2i-engineering.org",
-            full_name: "Reza Team Lead",
-            role: "Admin",
-            created_at: new Date(Date.now() - 14 * 86400000).toISOString(),
-          },
-        ]);
-      }
+      setAdminUsers(data ?? []);
     } catch (err) {
       console.warn("Error fetching admin users", err);
     } finally {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    fetchAdminUsers();
+  }, []);
 
   const handleSendInvite = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,15 +87,65 @@ export default function SettingsPage() {
         setIsInviteOpen(false);
         setInviteEmail("");
         setInviteFullName("");
+        setInviteRole("admin");
       } else {
         setMessage({ type: "error", text: data.error || "Failed to send invitation" });
       }
-    } catch (err: any) {
+    } catch {
       setMessage({ type: "error", text: "Network error sending invitation" });
     } finally {
       setSending(false);
     }
   };
+
+  async function handleToggleStatus() {
+    if (!statusTarget) return;
+    const nextStatus = statusTarget.status === "active" ? "suspended" : "active";
+
+    setActionLoading(true);
+    try {
+      const res = await fetch(`/api/admin/${statusTarget.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        setAdminUsers((prev) => prev.map((u) => (u.id === statusTarget.id ? { ...u, status: nextStatus } : u)));
+        setMessage({ type: "success", text: `${statusTarget.email} ${nextStatus === "active" ? "reactivated" : "suspended"}` });
+      } else {
+        setMessage({ type: "error", text: data.error || "Failed to update status" });
+      }
+    } catch {
+      setMessage({ type: "error", text: "Network error updating status" });
+    } finally {
+      setActionLoading(false);
+      setStatusTarget(null);
+    }
+  }
+
+  async function handleDelete() {
+    if (!deleteTarget) return;
+
+    setActionLoading(true);
+    try {
+      const res = await fetch(`/api/admin/${deleteTarget.id}`, { method: "DELETE" });
+      const data = await res.json();
+
+      if (res.ok) {
+        setAdminUsers((prev) => prev.filter((u) => u.id !== deleteTarget.id));
+        setMessage({ type: "success", text: `${deleteTarget.email} removed` });
+      } else {
+        setMessage({ type: "error", text: data.error || "Failed to delete admin" });
+      }
+    } catch {
+      setMessage({ type: "error", text: "Network error deleting admin" });
+    } finally {
+      setActionLoading(false);
+      setDeleteTarget(null);
+    }
+  }
 
   const columns: ColumnDef<AdminUser>[] = [
     {
@@ -113,7 +153,7 @@ export default function SettingsPage() {
       cell: (row) => (
         <Box>
           <Text fontWeight="semibold" color="white" fontSize="sm">
-            {row.full_name || "Admin Member"}
+            {row.full_name || row.email}
           </Text>
           <Text fontSize="xs" color="gray.400">
             {row.email}
@@ -127,17 +167,35 @@ export default function SettingsPage() {
       header: "Role",
       cell: (row) => (
         <Badge
-          bg={row.role.toLowerCase().includes("super") ? "rgba(168, 85, 247, 0.2)" : "rgba(99, 102, 241, 0.2)"}
-          color={row.role.toLowerCase().includes("super") ? "#C084FC" : "#A5B4FC"}
+          bg={row.role === "owner" ? "rgba(251, 191, 36, 0.15)" : "rgba(99, 102, 241, 0.2)"}
+          color={row.role === "owner" ? "#FBBF24" : "#A5B4FC"}
           px={2.5}
           py={0.5}
           borderRadius="md"
+          textTransform="capitalize"
         >
           {row.role}
         </Badge>
       ),
       sortable: true,
       accessorKey: "role",
+    },
+    {
+      header: "Status",
+      cell: (row) => (
+        <Badge
+          bg={row.status === "active" ? "rgba(16, 185, 129, 0.15)" : "rgba(239, 68, 68, 0.15)"}
+          color={row.status === "active" ? "#34D399" : "#FCA5A5"}
+          px={2.5}
+          py={0.5}
+          borderRadius="md"
+          textTransform="capitalize"
+        >
+          {row.status}
+        </Badge>
+      ),
+      sortable: true,
+      accessorKey: "status",
     },
     {
       header: "Joined Date",
@@ -149,6 +207,24 @@ export default function SettingsPage() {
       sortable: true,
       accessorKey: "created_at",
     },
+    ...(isOwner
+      ? [
+          {
+            header: "",
+            cell: (row: AdminUser) => (
+              <Flex gap={2} justify="flex-end">
+                <Button size="xs" variant="outline" colorPalette="gray" onClick={() => setStatusTarget(row)}>
+                  {row.status === "active" ? "Suspend" : "Reactivate"}
+                </Button>
+                <Button size="xs" variant="outline" colorPalette="red" onClick={() => setDeleteTarget(row)}>
+                  Delete
+                </Button>
+              </Flex>
+            ),
+            sortable: false,
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -225,16 +301,16 @@ export default function SettingsPage() {
 
         <Box className="glass-card" p={5} borderRadius="2xl">
           <Text fontSize="xs" fontWeight="bold" color="gray.400" textTransform="uppercase" letterSpacing="0.05em" mb={2}>
-            SECURITY MODE
+            YOUR ROLE
           </Text>
           <Flex align="center" gap={2}>
             <Box w="10px" h="10px" borderRadius="full" bg="#818CF8" boxShadow="0 0 10px #818CF8" />
-            <Text fontWeight="bold" color="white">
-              Server API Key Protection
+            <Text fontWeight="bold" color="white" textTransform="capitalize">
+              {session.admin.role}
             </Text>
           </Flex>
           <Text fontSize="xs" color="gray.500" mt={2}>
-            Service role key isolated server-side
+            {isOwner ? "Can suspend, reactivate, and delete admins" : "Content access only"}
           </Text>
         </Box>
       </SimpleGrid>
@@ -302,20 +378,52 @@ export default function SettingsPage() {
             <NativeSelect.Root size="md">
               <NativeSelect.Field
                 value={inviteRole}
-                onChange={(e) => setInviteRole(e.target.value)}
+                onChange={(e) => setInviteRole(e.target.value as "admin" | "owner")}
                 bg="#0F172A"
                 borderColor="rgba(255, 255, 255, 0.12)"
                 color="white"
                 borderRadius="xl"
               >
                 <option value="admin" style={{ background: "#0F172A", color: "white" }}>Admin</option>
-                <option value="editor" style={{ background: "#0F172A", color: "white" }}>Editor</option>
-                <option value="super_admin" style={{ background: "#0F172A", color: "white" }}>Super Admin</option>
+                {isOwner && (
+                  <option value="owner" style={{ background: "#0F172A", color: "white" }}>Owner</option>
+                )}
               </NativeSelect.Field>
             </NativeSelect.Root>
+            {!isOwner && (
+              <Text fontSize="xs" color="gray.500" mt={1}>
+                Only an Owner can invite another Owner.
+              </Text>
+            )}
           </Box>
         </VStack>
       </ModalFormWrapper>
+
+      {/* Suspend/Reactivate confirmation */}
+      <ConfirmDialog
+        isOpen={!!statusTarget}
+        onClose={() => setStatusTarget(null)}
+        onConfirm={handleToggleStatus}
+        isLoading={actionLoading}
+        title={statusTarget?.status === "active" ? "Suspend this admin?" : "Reactivate this admin?"}
+        description={
+          statusTarget?.status === "active"
+            ? `${statusTarget?.email} will immediately lose all admin access. This is reversible.`
+            : `${statusTarget?.email} will regain admin access immediately.`
+        }
+        confirmText={statusTarget?.status === "active" ? "Suspend" : "Reactivate"}
+      />
+
+      {/* Delete confirmation */}
+      <ConfirmDialog
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        isLoading={actionLoading}
+        title="Permanently delete this admin?"
+        description={`${deleteTarget?.email} will be permanently removed and lose all access. This cannot be undone.`}
+        confirmText="Delete Permanently"
+      />
     </Box>
   );
 }
