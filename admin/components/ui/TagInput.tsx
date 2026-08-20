@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Box, Flex, Input, Badge, Text } from "@chakra-ui/react";
+import { X } from "lucide-react";
 
 interface TagInputProps {
   tags: string[];
@@ -35,42 +36,15 @@ export function TagInput({
 
   return (
     <Box>
-      <Flex
-        wrap="wrap"
-        gap={2}
-        p={2.5}
-        border="1px solid rgba(255, 255, 255, 0.12)"
-        borderRadius="xl"
-        bg="rgba(15, 23, 42, 0.6)"
-        minH="48px"
-        align="center"
-      >
+      <Flex wrap="wrap" gap={2} p={2.5} border="1px solid" borderColor="admin.border" borderRadius="xl" bg="admin.bg" minH="48px" align="center">
         {tags.map((tag, idx) => (
-          <Badge
-            key={idx}
-            bg="linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%)"
-            color="#C7D2FE"
-            border="1px solid rgba(99, 102, 241, 0.4)"
-            px={3}
-            py={1}
-            borderRadius="lg"
-            display="flex"
-            alignItems="center"
-            gap={2}
-          >
+          <Badge key={idx} bg="info.subtle" color="info.fg" px={3} py={1} borderRadius="lg" display="flex" alignItems="center" gap={2}>
             <Text fontSize="xs" fontWeight="semibold">
               {tag}
             </Text>
-            <Text
-              as="span"
-              cursor="pointer"
-              fontWeight="bold"
-              fontSize="xs"
-              onClick={() => removeTag(tag)}
-              _hover={{ color: "red.300" }}
-            >
-              ✕
-            </Text>
+            <Box as="span" cursor="pointer" onClick={() => removeTag(tag)} display="flex" _hover={{ color: "#B23610" }}>
+              <X size={12} strokeWidth={2.5} />
+            </Box>
           </Badge>
         ))}
 
@@ -83,14 +57,14 @@ export function TagInput({
           border="none"
           outline="none"
           size="sm"
-          color="white"
+          color="admin.text"
           flex="1"
           minW="140px"
-          _placeholder={{ color: "gray.500" }}
+          _placeholder={{ color: "admin.textMuted" }}
           _focus={{ boxShadow: "none" }}
         />
       </Flex>
-      <Text fontSize="xs" color="gray.500" mt={1}>
+      <Text fontSize="xs" color="admin.textMuted" mt={1}>
         Press Enter or comma (,) to add tags. Backspace to remove last.
       </Text>
     </Box>

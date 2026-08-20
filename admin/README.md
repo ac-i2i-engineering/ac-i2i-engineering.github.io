@@ -31,6 +31,20 @@ node scripts/bootstrap-owner.mjs "you@example.com"
 - `app/api/admin/invite/`, `app/api/admin/[id]/` — admin-user management.
   Authorization happens here, in application code, not via RLS — see
   `docs/AUTH.md#where-authorization-is-actually-enforced`.
+- `app/api/account/update-profile/`, `app/api/account/clear-must-reset/` —
+  a signed-in admin updating their *own* row (name, avatar, first-login
+  password flag). Scoped to the caller's id from their session, never from
+  the request body, for the same reason as the routes above.
+- `lib/theme.ts` — the Chakra v3 design system. Colors are pulled from the
+  public site's actual palette (`css/style.css`), not invented separately —
+  `brand.*` mirrors `--primary-color`/`--secondary-color`/`--accent-color`.
+  Add new colors here as semantic tokens (`brand`, `danger`, `info`,
+  `admin.*`) rather than hardcoding hex in a component, so the look changes
+  in one place.
+- `components/ui/` — shared building blocks (`DataTable`, `ModalFormWrapper`,
+  `ConfirmDialog`, `PublishToggle`, `TagInput`, `ImageUploader`,
+  `AvatarUploader`) used across every content page, so a style change here
+  is a style change everywhere.
 - `proxy.ts` (repo root of `admin/`) — Next.js 16's renamed `middleware.ts`.
   Refreshes the session cookie every request and redirects requests with no
   Supabase session away from protected routes. Deliberately does not

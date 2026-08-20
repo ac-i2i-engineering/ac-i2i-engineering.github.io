@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Box, Button, Field, Flex, Input, Heading, Stack, Text } from "@chakra-ui/react";
+import Image from "next/image";
+import { Box, Button, Field, Flex, Input, Text } from "@chakra-ui/react";
 import { createClient } from "@/lib/supabase/client";
 
 export function LoginForm() {
@@ -33,33 +34,38 @@ export function LoginForm() {
   }
 
   return (
-    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="#0B0F19">
-      <Box w="full" maxW="sm" p={8} borderRadius="lg" bg="#111827" borderWidth="1px" borderColor="whiteAlpha.200">
-        <Heading size="md" mb={1} color="white">
-          i2i Admin
-        </Heading>
-        <Text fontSize="sm" color="gray.400" mb={6}>
+    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="admin.bg">
+      <Box w="full" maxW="sm" p={8} borderRadius="2xl" bg="admin.surface" borderWidth="1px" borderColor="admin.border" boxShadow="0 20px 50px -20px rgba(26, 20, 16, 0.2)">
+        <Flex justify="center" mb={6}>
+          <Image src="/i2i-logo.png" alt="i2i" width={150} height={45} style={{ height: "40px", width: "auto" }} priority />
+        </Flex>
+
+        <Text fontSize="sm" color="admin.textMuted" mb={6} textAlign="center">
           Sign in to manage site content.
         </Text>
 
         <form onSubmit={handleSubmit}>
-          <Stack gap={4}>
+          <Flex direction="column" gap={4}>
             <Field.Root>
-              <Field.Label color="gray.300">Email</Field.Label>
+              <Field.Label color="admin.text">Email</Field.Label>
               <Input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
-                color="white"
+                color="admin.text"
+                borderColor="admin.border"
+                _focus={{ borderColor: "brand.emphasized" }}
               />
             </Field.Root>
 
             <Field.Root>
               <Flex justify="space-between" align="center" mb={1} w="full">
-                <Field.Label color="gray.300" mb={0}>Password</Field.Label>
-                <Link href="/forgot-password" style={{ fontSize: "12px", color: "#818CF8" }}>
+                <Field.Label color="admin.text" mb={0}>
+                  Password
+                </Field.Label>
+                <Link href="/forgot-password" style={{ fontSize: "12px", color: "#D24114" }}>
                   Forgot password?
                 </Link>
               </Flex>
@@ -69,20 +75,22 @@ export function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
-                color="white"
+                color="admin.text"
+                borderColor="admin.border"
+                _focus={{ borderColor: "brand.emphasized" }}
               />
             </Field.Root>
 
             {error && (
-              <Text fontSize="sm" color="red.400">
+              <Text fontSize="sm" color="red.500">
                 {error}
               </Text>
             )}
 
-            <Button type="submit" colorPalette="orange" loading={loading}>
+            <Button type="submit" colorPalette="brand" loading={loading}>
               Sign in
             </Button>
-          </Stack>
+          </Flex>
         </form>
       </Box>
     </Box>

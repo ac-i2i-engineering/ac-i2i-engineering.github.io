@@ -3,7 +3,9 @@
 Source of truth: everything in [`supabase/migrations/`](../supabase/migrations),
 applied in order — `0001` tables/triggers/`is_admin()`, `0002` Storage buckets,
 `0003` RLS policies, `0004` Storage policies, `0005` seed data, `0006` dashboard
-stats RPC, `0007`–`0008` image URL fixes, `0009` Owner/Admin roles + `is_owner()`.
+stats RPC, `0007`–`0008` image URL fixes, `0009` Owner/Admin roles + `is_owner()`,
+`0010` temp-password invite flow, `0011` activity log triggers, `0012` admin
+avatars, `0013` media show/hide.
 TypeScript mirror: [`admin/lib/types.ts`](../admin/lib/types.ts).
 
 If you change a column, update the migration, `lib/types.ts`, and this table
@@ -18,8 +20,8 @@ names matching exactly.
 | `team_members` | Individual people, linked to a department, `is_lead` flags leadership | published rows | yes |
 | `events` | Calendar events | published rows | yes |
 | `startups` | Projects/Startups showcase | published rows | yes |
-| `media` | Uploaded images, optionally attached to a team member/event/startup | all rows | yes |
-| `admin_users` | Allowlist of who can sign in to `/admin` and write data. `role` is `owner` \| `admin`; `status` is `active` \| `suspended` (`0009`); `must_reset_password` forces a password change before first real use, set on invite (`0010`) | admin-only | **no** — service_role only |
+| `media` | Uploaded images, optionally attached to a team member/event/startup. `is_published` (`0013`) controls whether it shows on the public Media Gallery (`media.html`) | published rows | yes |
+| `admin_users` | Allowlist of who can sign in to `/admin` and write data. `role` is `owner` \| `admin`; `status` is `active` \| `suspended` (`0009`); `must_reset_password` forces a password change before first real use, set on invite (`0010`); `avatar_url` (`0012`) is optional, shown in the account menu and admin table, falls back to initials | admin-only | **no** — service_role only |
 | `activity_logs` | Audit trail of content changes, auto-populated by an `AFTER` trigger on `team_members`/`events`/`startups`/`media` (`0011`) | admin-only | **no** — trigger only (`security definer`), nothing writes here directly |
 
 "Admin write" is enforced by RLS via the `is_admin()` helper function, which
@@ -48,7 +50,7 @@ This is what is enforced:
 | `team_members` | `using (is_published = true or is_admin())` | `is_admin()` |
 | `events` | `using (is_published = true or is_admin())` | `is_admin()` |
 | `startups` | `using (is_published = true or is_admin())` | `is_admin()` |
-| `media` | `using (true)` — everyone | `is_admin()` |
+| `media` | `using (is_published = true or is_admin())` (`0013`) | `is_admin()` |
 | `admin_users` | `using (is_admin())` | **no policy at all** — writes only via `service_role`, bypassing RLS entirely |
 | `activity_logs` | `using (is_admin())` | **no policy at all** — populated only by the `log_activity()` trigger (`0011`), which is `security definer` and bypasses RLS the same way `service_role` would |
 
@@ -83,9 +85,11 @@ real signed-in admin request can write.
 | `event-images` | `events.image_url` |
 | `startup-images` | `startups.image_url` |
 | `media-gallery` | standalone Media Manager uploads |
+| `admin-avatars` | `admin_users.avatar_url` (`0012`) |
 
 All buckets are public-read, admin-write (same `is_admin()` check) — 16
-policies on `storage.objects` in `0004`, four per bucket, each scoped by
+policies on `storage.objects` in `0004` for the first four buckets, plus 4
+more in `0012` for `admin-avatars`, four per bucket, each scoped by
 `bucket_id`.
 
 Because the buckets are `public = true`, the CDN route

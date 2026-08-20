@@ -27,27 +27,28 @@ export function ConfirmDialog({
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={(e) => !e.open && onClose()}>
-      <Dialog.Backdrop bg="rgba(0, 0, 0, 0.75)" backdropFilter="blur(8px)" />
+      <Dialog.Backdrop bg="rgba(26, 20, 16, 0.5)" backdropFilter="blur(4px)" />
       <Dialog.Positioner>
-        <Dialog.Content bg="#0F172A" border="1px solid rgba(255, 255, 255, 0.12)" borderRadius="2xl" maxW="420px" p={6} color="white">
+        <Dialog.Content bg="admin.surface" border="1px solid" borderColor="admin.border" borderRadius="2xl" maxW="420px" p={6} color="admin.text">
           <Dialog.Header>
-            <Dialog.Title color="white" fontWeight="bold">
+            <Dialog.Title color="admin.text" fontWeight="bold">
               {title}
             </Dialog.Title>
           </Dialog.Header>
           <Dialog.Body my={3}>
-            <Text color="gray.400" fontSize="sm">
+            <Text color="admin.textMuted" fontSize="sm">
               {description}
             </Text>
           </Dialog.Body>
           <Dialog.Footer gap={3}>
-            <Button variant="outline" borderColor="rgba(255, 255, 255, 0.15)" color="gray.300" onClick={onClose} disabled={isLoading}>
+            <Button variant="outline" borderColor="admin.border" color="admin.text" onClick={onClose} disabled={isLoading}>
               {cancelText}
             </Button>
             <Button
-              bg="linear-gradient(135deg, #EF4444 0%, #DC2626 100%)"
+              bg="#C0341A"
               color="white"
               fontWeight="bold"
+              _hover={{ bg: "#A32B15" }}
               onClick={() => {
                 onConfirm();
                 onClose();

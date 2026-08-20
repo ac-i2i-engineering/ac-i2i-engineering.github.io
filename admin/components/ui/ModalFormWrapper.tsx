@@ -25,52 +25,38 @@ export function ModalFormWrapper({
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={(e) => !e.open && onClose()}>
-      <Dialog.Backdrop bg="rgba(0, 0, 0, 0.75)" backdropFilter="blur(8px)" />
+      <Dialog.Backdrop bg="rgba(26, 20, 16, 0.5)" backdropFilter="blur(4px)" />
       <Dialog.Positioner>
         <Dialog.Content
-          bg="#0F172A"
-          border="1px solid rgba(255, 255, 255, 0.12)"
+          bg="admin.surface"
+          border="1px solid"
+          borderColor="admin.border"
           borderRadius="2xl"
           maxW="560px"
           w="92vw"
           p={6}
           as="form"
           onSubmit={onSubmit}
-          boxShadow="0 25px 50px -12px rgba(0, 0, 0, 0.8)"
-          color="white"
+          boxShadow="0 25px 50px -12px rgba(26, 20, 16, 0.25)"
+          color="admin.text"
         >
-          <Dialog.Header pb={4} borderBottom="1px solid rgba(255, 255, 255, 0.08)">
-            <Dialog.Title color="white" fontWeight="bold" fontSize="lg">
+          <Dialog.Header pb={4} borderBottom="1px solid" borderColor="admin.border">
+            <Dialog.Title color="admin.text" fontWeight="bold" fontSize="lg">
               {title}
             </Dialog.Title>
-            <Dialog.CloseTrigger onClick={onClose} color="gray.400" _hover={{ color: "white" }} />
+            <Dialog.CloseTrigger onClick={onClose} color="admin.textMuted" _hover={{ color: "admin.text" }} />
           </Dialog.Header>
 
           <Dialog.Body py={5} maxH="70vh" overflowY="auto">
             {children}
           </Dialog.Body>
 
-          <Dialog.Footer pt={4} borderTop="1px solid rgba(255, 255, 255, 0.08)">
+          <Dialog.Footer pt={4} borderTop="1px solid" borderColor="admin.border">
             <Flex gap={3} justify="flex-end" w="100%">
-              <Button
-                variant="outline"
-                borderColor="rgba(255, 255, 255, 0.15)"
-                color="gray.300"
-                onClick={onClose}
-                type="button"
-                disabled={isLoading}
-              >
+              <Button variant="outline" borderColor="admin.border" color="admin.text" onClick={onClose} type="button" disabled={isLoading}>
                 Cancel
               </Button>
-              <Button
-                background="linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)"
-                color="white"
-                type="submit"
-                loading={isLoading}
-                fontWeight="bold"
-                px={6}
-                borderRadius="xl"
-              >
+              <Button colorPalette="brand" type="submit" loading={isLoading} fontWeight="bold" px={6} borderRadius="xl">
                 {submitLabel}
               </Button>
             </Flex>
