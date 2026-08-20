@@ -3,7 +3,11 @@
 // client-write path at all (see docs/SCHEMA.md), so the first Owner can't be
 // created through the app -- same reason Django ships `createsuperuser` and
 // Rails ships seed scripts. Every Owner/Admin after this one is created
-// through the app's "invite" flow instead.
+// through the app's "invite" flow instead (a temp password, not email).
+//
+// Sets a real password directly at creation -- no invite email involved, so
+// bootstrapping doesn't depend on Supabase's email sending at all. You'll be
+// prompted for the password interactively.
 //
 // Usage:
 //   cd admin
@@ -16,6 +20,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import readline from "node:readline/promises";
 import path from "node:path";
 
 function loadDotEnvLocal() {
@@ -59,21 +64,32 @@ if (existing) {
   process.exit(1);
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-const { data: invite, error: inviteErr } = await supabase.auth.admin.inviteUserByEmail(email, {
-  redirectTo: `${siteUrl}/auth/confirm?next=/set-password`,
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+const password = await rl.question("Set a password for this Owner account (min 8 characters): ");
+rl.close();
+
+if (!password || password.length < 8) {
+  console.error("Password must be at least 8 characters.");
+  process.exit(1);
+}
+
+const { data: created, error: createErr } = await supabase.auth.admin.createUser({
+  email,
+  password,
+  email_confirm: true,
 });
-if (inviteErr || !invite?.user) {
-  console.error("Failed to invite user via Supabase Auth:", inviteErr?.message ?? "no user returned");
+if (createErr || !created?.user) {
+  console.error("Failed to create user via Supabase Auth:", createErr?.message ?? "no user returned");
   process.exit(1);
 }
 
 const { error: insertErr } = await supabase.from("admin_users").insert([
   {
-    id: invite.user.id,
+    id: created.user.id,
     email,
     role: "owner",
     status: "active",
+    must_reset_password: false,
   },
 ]);
 
@@ -82,4 +98,4 @@ if (insertErr) {
   process.exit(1);
 }
 
-console.log(`Owner bootstrapped: ${email}. They'll receive an invite email to set their password.`);
+console.log(`Owner bootstrapped: ${email}. Sign in at /login with the password you just set.`);

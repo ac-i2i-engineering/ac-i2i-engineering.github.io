@@ -19,7 +19,7 @@ names matching exactly.
 | `events` | Calendar events | published rows | yes |
 | `startups` | Projects/Startups showcase | published rows | yes |
 | `media` | Uploaded images, optionally attached to a team member/event/startup | all rows | yes |
-| `admin_users` | Allowlist of who can sign in to `/admin` and write data. `role` is `owner` \| `admin`; `status` is `active` \| `suspended` (`0009`) | admin-only | **no** — service_role only |
+| `admin_users` | Allowlist of who can sign in to `/admin` and write data. `role` is `owner` \| `admin`; `status` is `active` \| `suspended` (`0009`); `must_reset_password` forces a password change before first real use, set on invite (`0010`) | admin-only | **no** — service_role only |
 | `activity_logs` | Audit trail of content changes (optional/stretch) | admin-only | **no** — service_role only |
 
 "Admin write" is enforced by RLS via the `is_admin()` helper function, which

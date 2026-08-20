@@ -12,6 +12,8 @@ import {
   NativeSelect,
   VStack,
   SimpleGrid,
+  Dialog,
+  Code,
 } from "@chakra-ui/react";
 import { DataTable, ColumnDef } from "@/components/ui/DataTable";
 import { ModalFormWrapper } from "@/components/ui/ModalFormWrapper";
@@ -34,6 +36,7 @@ export default function SettingsPage() {
   const [inviteFullName, setInviteFullName] = useState("");
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [issuedCredential, setIssuedCredential] = useState<{ email: string; tempPassword: string } | null>(null);
 
   const [statusTarget, setStatusTarget] = useState<AdminUser | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
@@ -82,9 +85,9 @@ export default function SettingsPage() {
       const data = await res.json();
 
       if (res.ok && data.user) {
-        setMessage({ type: "success", text: `Invitation sent to ${inviteEmail}` });
         setAdminUsers((prev) => [data.user, ...prev]);
         setIsInviteOpen(false);
+        setIssuedCredential({ email: inviteEmail, tempPassword: data.tempPassword });
         setInviteEmail("");
         setInviteFullName("");
         setInviteRole("admin");
@@ -398,6 +401,59 @@ export default function SettingsPage() {
           </Box>
         </VStack>
       </ModalFormWrapper>
+
+      {/* Temp password, shown exactly once -- not recoverable after this closes */}
+      <Dialog.Root open={!!issuedCredential} onOpenChange={(e) => !e.open && setIssuedCredential(null)}>
+        <Dialog.Backdrop bg="rgba(0, 0, 0, 0.75)" backdropFilter="blur(8px)" />
+        <Dialog.Positioner>
+          <Dialog.Content bg="#0F172A" border="1px solid rgba(255, 255, 255, 0.12)" borderRadius="2xl" maxW="440px" p={6} color="white">
+            <Dialog.Header>
+              <Dialog.Title color="white" fontWeight="bold">
+                Admin account created
+              </Dialog.Title>
+            </Dialog.Header>
+            <Dialog.Body my={3}>
+              <Text color="gray.400" fontSize="sm" mb={4}>
+                Share this temporary password with <b>{issuedCredential?.email}</b> directly (Slack, text, in
+                person) -- not email. It won&apos;t be shown again. They&apos;ll be required to set their own
+                password the first time they sign in.
+              </Text>
+              <Code
+                display="block"
+                p={3}
+                borderRadius="lg"
+                fontSize="md"
+                bg="rgba(99, 102, 241, 0.12)"
+                color="#A5B4FC"
+                textAlign="center"
+                userSelect="all"
+              >
+                {issuedCredential?.tempPassword}
+              </Code>
+            </Dialog.Body>
+            <Dialog.Footer gap={3}>
+              <Button
+                variant="outline"
+                borderColor="rgba(255, 255, 255, 0.15)"
+                color="gray.300"
+                onClick={() => {
+                  if (issuedCredential) navigator.clipboard?.writeText(issuedCredential.tempPassword);
+                }}
+              >
+                Copy
+              </Button>
+              <Button
+                bg="linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)"
+                color="white"
+                fontWeight="bold"
+                onClick={() => setIssuedCredential(null)}
+              >
+                Done
+              </Button>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Root>
 
       {/* Suspend/Reactivate confirmation */}
       <ConfirmDialog

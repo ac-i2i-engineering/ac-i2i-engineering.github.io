@@ -2,8 +2,9 @@ import { type EmailOtpType } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-// Where invite (inviteUserByEmail) and reset (resetPasswordForEmail) links
-// actually land. Neither @supabase/ssr's browser client nor the proxy
+// Where the forgot-password link (resetPasswordForEmail) actually lands --
+// invites no longer go through email at all, see docs/AUTH.md. Neither
+// @supabase/ssr's browser client nor the proxy
 // establishes a session just from loading a page with a token in the URL --
 // that only happens for the old implicit flow. The current default requires
 // exchanging the token server-side first, which is what this route does,
