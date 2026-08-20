@@ -59,10 +59,16 @@ policies are added and pushed as a follow-up migration.
    auto-deploys — no GitHub Action needed, Vercel's GitHub integration
    handles it.
 
+**Live at:** `https://ac-i2i-engineering-github-io.vercel.app` — this exact
+URL must also be in the Supabase project's Site URL / Redirect URLs
+(Authentication → URL Configuration in the dashboard), matching
+`supabase/config.toml`'s `[auth]` section, or invite/reset emails won't
+redirect anywhere useful in production. See `docs/AUTH.md`.
+
 ## Summary
 
 | Piece | Host | Deploys on | Manual step required |
 |---|---|---|---|
 | Public site | GitHub Pages | push to `main` | none — already configured |
-| Admin panel | Vercel | push to `main` (after import) | one-time: import repo, set root dir + env vars |
+| Admin panel | Vercel | push to `main` (after import) | done — live at the URL above |
 | Database | Supabase | `supabase db push` | run manually when migrations change — not automatic |
