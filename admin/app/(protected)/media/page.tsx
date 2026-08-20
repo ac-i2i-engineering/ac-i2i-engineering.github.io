@@ -19,12 +19,11 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ImageUploader } from "@/components/ui/ImageUploader";
 import { PublishToggle } from "@/components/ui/PublishToggle";
 import { createClient } from "@/lib/supabase/client";
-import { STORAGE_BUCKETS, Media, MediaAttachedToType } from "@/lib/types";
+import { Media, MediaAttachedToType } from "@/lib/types";
 
 export default function MediaPage() {
   const [mediaList, setMediaList] = useState<Media[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeBucket, setActiveBucket] = useState<string>("all");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMedia, setEditingMedia] = useState<Partial<Media> | null>(null);
@@ -156,7 +155,7 @@ export default function MediaPage() {
             Media Manager
           </Heading>
           <Text color="admin.textMuted" fontSize="sm">
-            Browse uploaded images across storage buckets, upload new files, and link them to records.
+            {mediaList.length} {mediaList.length === 1 ? "item" : "items"} — upload new files and link them to records.
           </Text>
         </Box>
 
@@ -164,35 +163,6 @@ export default function MediaPage() {
           <Upload size={16} />
           Upload Media
         </Button>
-      </Flex>
-
-      {/* Bucket Filter Bar */}
-      <Flex gap={2} mb={6} wrap="wrap">
-        <Button
-          size="sm"
-          borderRadius="xl"
-          bg={activeBucket === "all" ? "brand.solid" : "admin.surface"}
-          border="1px solid"
-          borderColor={activeBucket === "all" ? "transparent" : "admin.border"}
-          color={activeBucket === "all" ? "white" : "admin.text"}
-          onClick={() => setActiveBucket("all")}
-        >
-          All Media ({mediaList.length})
-        </Button>
-        {Object.entries(STORAGE_BUCKETS).map(([key, bucket]) => (
-          <Button
-            key={key}
-            size="sm"
-            borderRadius="xl"
-            bg={activeBucket === bucket ? "brand.solid" : "admin.surface"}
-            border="1px solid"
-            borderColor={activeBucket === bucket ? "transparent" : "admin.border"}
-            color={activeBucket === bucket ? "white" : "admin.text"}
-            onClick={() => setActiveBucket(bucket)}
-          >
-            {bucket}
-          </Button>
-        ))}
       </Flex>
 
       {/* Media Grid */}
