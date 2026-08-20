@@ -87,6 +87,7 @@ export interface AdminUser {
   full_name: string | null;
   role: AdminRole;
   status: AdminStatus;
+  must_reset_password: boolean;
   created_at: string;
 }
 

@@ -5,13 +5,16 @@ import { useRouter } from "next/navigation";
 import { Box, Button, Field, Heading, Input, Stack, Text } from "@chakra-ui/react";
 import { createClient } from "@/lib/supabase/client";
 
-// Shared by two flows that both land here the same way -- inviteUserByEmail
-// (new admin) and resetPasswordForEmail (forgot password), both via their
-// redirectTo. Supabase's client SDK reads the token from the URL and
-// establishes a session automatically on load -- there's nothing to do here
-// except call updateUser with the new password once the form is submitted.
-// Copy stays generic since there's no reliable way to tell which flow sent
-// someone here.
+// Shared by three flows that all land here with a session already
+// established, just by different routes:
+//   - a temp-password invite (see /api/admin/invite), forced here by the
+//     protected layout while admin_users.must_reset_password is true
+//   - resetPasswordForEmail (forgot password), via /auth/confirm
+//   - an invited/reset user who already has a session but revisits this URL
+// All three just need updateUser with the new password, then a call to
+// clear must_reset_password (a harmless no-op for the two paths where it
+// was already false). Copy stays generic since there's no reliable way to
+// tell which flow sent someone here.
 export default function SetPasswordPage() {
   const router = useRouter();
   const [password, setPassword] = useState("");
@@ -35,13 +38,19 @@ export default function SetPasswordPage() {
     setLoading(true);
     const supabase = createClient();
     const { error: updateError } = await supabase.auth.updateUser({ password });
-    setLoading(false);
 
     if (updateError) {
+      setLoading(false);
       setError(updateError.message);
       return;
     }
 
+    await fetch("/api/account/clear-must-reset", { method: "POST" }).catch(() => {
+      // Non-fatal -- worst case they're asked to set a password again next
+      // login, not locked out or left insecure.
+    });
+
+    setLoading(false);
     router.push("/");
     router.refresh();
   }
