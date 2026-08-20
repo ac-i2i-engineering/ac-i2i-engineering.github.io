@@ -55,15 +55,7 @@ export default function HomePage() {
           .order("created_at", { ascending: false })
           .limit(5);
 
-        if (actData && actData.length > 0) {
-          setActivities(actData as ActivityLogItem[]);
-        } else {
-          setActivities([
-            { id: "1", action: "create", entity_type: "event", summary: "Created new hackathon event", created_at: new Date(Date.now() - 3600000).toISOString() },
-            { id: "2", action: "update", entity_type: "team_member", summary: "Updated department roles & leads", created_at: new Date(Date.now() - 7200000).toISOString() },
-            { id: "3", action: "create", entity_type: "startup", summary: "Added new NeuroTech startup entry", created_at: new Date(Date.now() - 86400000).toISOString() },
-          ]);
-        }
+        setActivities((actData as ActivityLogItem[]) ?? []);
       } catch (err) {
         console.warn("Failed to load stats", err);
       } finally {
@@ -223,6 +215,10 @@ export default function HomePage() {
               Fetching updates...
             </Text>
           </Flex>
+        ) : activities.length === 0 ? (
+          <Text fontSize="sm" color="gray.500" py={4}>
+            No activity yet. Actions taken across Team, Events, Projects, and Media will show up here.
+          </Text>
         ) : (
           <Box>
             {activities.map((act) => (

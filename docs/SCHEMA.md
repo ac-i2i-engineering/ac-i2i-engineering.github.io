@@ -20,7 +20,7 @@ names matching exactly.
 | `startups` | Projects/Startups showcase | published rows | yes |
 | `media` | Uploaded images, optionally attached to a team member/event/startup | all rows | yes |
 | `admin_users` | Allowlist of who can sign in to `/admin` and write data. `role` is `owner` \| `admin`; `status` is `active` \| `suspended` (`0009`); `must_reset_password` forces a password change before first real use, set on invite (`0010`) | admin-only | **no** — service_role only |
-| `activity_logs` | Audit trail of content changes (optional/stretch) | admin-only | **no** — service_role only |
+| `activity_logs` | Audit trail of content changes, auto-populated by an `AFTER` trigger on `team_members`/`events`/`startups`/`media` (`0011`) | admin-only | **no** — trigger only (`security definer`), nothing writes here directly |
 
 "Admin write" is enforced by RLS via the `is_admin()` helper function, which
 checks `auth.uid()` exists in `admin_users` **and** `status = 'active'`
@@ -50,7 +50,7 @@ This is what is enforced:
 | `startups` | `using (is_published = true or is_admin())` | `is_admin()` |
 | `media` | `using (true)` — everyone | `is_admin()` |
 | `admin_users` | `using (is_admin())` | **no policy at all** — writes only via `service_role`, bypassing RLS entirely |
-| `activity_logs` | `using (is_admin())` | **no policy at all** — writes only via `service_role` |
+| `activity_logs` | `using (is_admin())` | **no policy at all** — populated only by the `log_activity()` trigger (`0011`), which is `security definer` and bypasses RLS the same way `service_role` would |
 
 Reads are scoped `to anon, authenticated` and writes `to authenticated`. A
 policy with no role list applies to `PUBLIC` — every role — which is how the
