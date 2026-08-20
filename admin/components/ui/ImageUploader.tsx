@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Box, Flex, Text, Button, Spinner, Image } from "@chakra-ui/react";
+import { Upload } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface ImageUploaderProps {
@@ -55,7 +56,7 @@ export function ImageUploader({
         };
         reader.readAsDataURL(file);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.warn("Upload exception, encoding as Data URL", err);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -71,21 +72,21 @@ export function ImageUploader({
 
   return (
     <Box>
-      <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={2}>
+      <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={2}>
         {label}
       </Text>
 
       {value ? (
-        <Box border="1px solid rgba(255, 255, 255, 0.12)" borderRadius="xl" p={3.5} bg="rgba(15, 23, 42, 0.6)">
+        <Box border="1px solid" borderColor="admin.border" borderRadius="xl" p={3.5} bg="admin.bg">
           <Flex align="center" gap={4}>
-            <Box w="68px" h="68px" borderRadius="lg" overflow="hidden" bg="gray.800" flexShrink={0}>
+            <Box w="68px" h="68px" borderRadius="lg" overflow="hidden" bg="admin.border" flexShrink={0}>
               <Image src={value} alt="Preview" w="100%" h="100%" objectFit="cover" />
             </Box>
             <Box flex="1" overflow="hidden">
-              <Text fontSize="xs" color="gray.400" truncate maxW="280px">
+              <Text fontSize="xs" color="admin.textMuted" truncate maxW="280px">
                 {value}
               </Text>
-              <Button size="xs" variant="outline" colorPalette="red" mt={2} onClick={() => onChange("")}>
+              <Button size="xs" variant="outline" colorPalette="danger" mt={2} onClick={() => onChange("")}>
                 Remove Image
               </Button>
             </Box>
@@ -93,12 +94,13 @@ export function ImageUploader({
         </Box>
       ) : (
         <Box
-          border="2px dashed rgba(255, 255, 255, 0.18)"
+          border="2px dashed"
+          borderColor="admin.border"
           borderRadius="xl"
           p={6}
           textAlign="center"
-          bg="rgba(15, 23, 42, 0.5)"
-          _hover={{ borderColor: "#818CF8", bg: "rgba(99, 102, 241, 0.08)" }}
+          bg="admin.bg"
+          _hover={{ borderColor: "brand.emphasized", bg: "brand.subtle" }}
           cursor="pointer"
           position="relative"
           transition="all 0.2s"
@@ -120,20 +122,20 @@ export function ImageUploader({
 
           {uploading ? (
             <Flex justify="center" align="center" gap={2.5}>
-              <Spinner size="sm" color="indigo.400" />
-              <Text fontSize="sm" color="indigo.300">
+              <Spinner size="sm" color="brand.solid" />
+              <Text fontSize="sm" color="brand.fg">
                 Processing & uploading image...
               </Text>
             </Flex>
           ) : (
             <Box>
-              <Text fontSize="3xl" mb={1}>
-                ☁️
-              </Text>
-              <Text fontSize="sm" fontWeight="semibold" color="gray.200">
+              <Flex justify="center" mb={2}>
+                <Upload size={26} color="#5C4E42" strokeWidth={1.75} />
+              </Flex>
+              <Text fontSize="sm" fontWeight="semibold" color="admin.text">
                 Click or drag & drop image here
               </Text>
-              <Text fontSize="xs" color="gray.500" mt={1}>
+              <Text fontSize="xs" color="admin.textMuted" mt={1}>
                 PNG, JPG, WEBP, GIF up to 5MB
               </Text>
             </Box>
@@ -142,7 +144,7 @@ export function ImageUploader({
       )}
 
       {errorMsg && (
-        <Text fontSize="xs" color="red.400" mt={1.5}>
+        <Text fontSize="xs" color="red.500" mt={1.5}>
           {errorMsg}
         </Text>
       )}

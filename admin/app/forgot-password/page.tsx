@@ -37,43 +37,44 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="#0B0F19">
-      <Box w="full" maxW="sm" p={8} borderRadius="lg" bg="#111827" borderWidth="1px" borderColor="whiteAlpha.200">
-        <Heading size="md" mb={1} color="white">
+    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="admin.bg">
+      <Box w="full" maxW="sm" p={8} borderRadius="2xl" bg="admin.surface" borderWidth="1px" borderColor="admin.border" boxShadow="0 20px 50px -20px rgba(26, 20, 16, 0.2)">
+        <Heading size="md" mb={1} color="admin.text">
           Reset your password
         </Heading>
 
         {sent ? (
-          <Text fontSize="sm" color="gray.400" mt={4}>
-            If that email has an admin account, a reset link has been sent to it.
-            Check your inbox.
+          <Text fontSize="sm" color="admin.textMuted" mt={4}>
+            If that email has an admin account, a reset link has been sent to it. Check your inbox.
           </Text>
         ) : (
           <>
-            <Text fontSize="sm" color="gray.400" mb={6}>
+            <Text fontSize="sm" color="admin.textMuted" mb={6}>
               Enter your email and we&apos;ll send you a link to set a new password.
             </Text>
             <form onSubmit={handleSubmit}>
               <Stack gap={4}>
                 <Field.Root>
-                  <Field.Label color="gray.300">Email</Field.Label>
+                  <Field.Label color="admin.text">Email</Field.Label>
                   <Input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     autoComplete="email"
-                    color="white"
+                    color="admin.text"
+                    borderColor="admin.border"
+                    _focus={{ borderColor: "brand.emphasized" }}
                   />
                 </Field.Root>
 
                 {error && (
-                  <Text fontSize="sm" color="red.400">
+                  <Text fontSize="sm" color="red.500">
                     {error}
                   </Text>
                 )}
 
-                <Button type="submit" colorPalette="orange" loading={loading}>
+                <Button type="submit" colorPalette="brand" loading={loading}>
                   Send reset link
                 </Button>
               </Stack>

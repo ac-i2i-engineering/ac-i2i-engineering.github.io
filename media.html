@@ -218,6 +218,7 @@
         const { data: items, error } = await supabaseClient
           .from('media')
           .select('*')
+          .eq('is_published', true)
           .order('sort_order', { ascending: true });
 
         if (error) throw error;

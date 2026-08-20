@@ -11,13 +11,15 @@ import {
   Input,
   NativeSelect,
   VStack,
-  SimpleGrid,
+  Avatar,
   Dialog,
   Code,
 } from "@chakra-ui/react";
+import { Copy, Check } from "lucide-react";
 import { DataTable, ColumnDef } from "@/components/ui/DataTable";
 import { ModalFormWrapper } from "@/components/ui/ModalFormWrapper";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { AvatarUploader } from "@/components/ui/AvatarUploader";
 import { createClient } from "@/lib/supabase/client";
 import { useAdminSession } from "@/lib/auth/SessionContext";
 import { relativeTime } from "@/lib/utils/relativeTime";
@@ -37,21 +39,23 @@ export default function SettingsPage() {
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [issuedCredential, setIssuedCredential] = useState<{ email: string; tempPassword: string } | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const [statusTarget, setStatusTarget] = useState<AdminUser | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+
+  const [profileName, setProfileName] = useState(session.admin.full_name ?? "");
+  const [profileAvatar, setProfileAvatar] = useState(session.admin.avatar_url ?? "");
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileMessage, setProfileMessage] = useState<string | null>(null);
 
   async function fetchAdminUsers() {
     setLoading(true);
     const supabase = createClient();
 
     try {
-      const { data } = await supabase
-        .from("admin_users")
-        .select("*")
-        .order("created_at", { ascending: false });
-
+      const { data } = await supabase.from("admin_users").select("*").order("created_at", { ascending: false });
       setAdminUsers(data ?? []);
     } catch (err) {
       console.warn("Error fetching admin users", err);
@@ -64,6 +68,31 @@ export default function SettingsPage() {
     fetchAdminUsers();
   }, []);
 
+  async function handleSaveProfile(e: React.FormEvent) {
+    e.preventDefault();
+    setSavingProfile(true);
+    setProfileMessage(null);
+
+    try {
+      const res = await fetch("/api/account/update-profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ full_name: profileName, avatar_url: profileAvatar || null }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        setProfileMessage("Profile updated.");
+      } else {
+        setProfileMessage(data.error || "Failed to update profile");
+      }
+    } catch {
+      setProfileMessage("Network error updating profile");
+    } finally {
+      setSavingProfile(false);
+    }
+  }
+
   const handleSendInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteEmail) return;
@@ -75,11 +104,7 @@ export default function SettingsPage() {
       const res = await fetch("/api/admin/invite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: inviteEmail,
-          role: inviteRole,
-          fullName: inviteFullName,
-        }),
+        body: JSON.stringify({ email: inviteEmail, role: inviteRole, fullName: inviteFullName }),
       });
 
       const data = await res.json();
@@ -154,14 +179,29 @@ export default function SettingsPage() {
     {
       header: "Admin User",
       cell: (row) => (
-        <Box>
-          <Text fontWeight="semibold" color="white" fontSize="sm">
-            {row.full_name || row.email}
-          </Text>
-          <Text fontSize="xs" color="gray.400">
-            {row.email}
-          </Text>
-        </Box>
+        <Flex align="center" gap={3}>
+          <Avatar.Root size="sm">
+            <Avatar.Fallback
+              name={row.full_name || row.email}
+              bg="brand.solid"
+              color="white"
+              w="100%"
+              h="100%"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            />
+            {row.avatar_url && <Avatar.Image src={row.avatar_url} alt={row.full_name || row.email} />}
+          </Avatar.Root>
+          <Box>
+            <Text fontWeight="semibold" color="admin.text" fontSize="sm">
+              {row.full_name || row.email}
+            </Text>
+            <Text fontSize="xs" color="admin.textMuted">
+              {row.email}
+            </Text>
+          </Box>
+        </Flex>
       ),
       sortable: true,
       accessorKey: "email",
@@ -170,8 +210,8 @@ export default function SettingsPage() {
       header: "Role",
       cell: (row) => (
         <Badge
-          bg={row.role === "owner" ? "rgba(251, 191, 36, 0.15)" : "rgba(99, 102, 241, 0.2)"}
-          color={row.role === "owner" ? "#FBBF24" : "#A5B4FC"}
+          bg={row.role === "owner" ? "#FEF3C7" : "info.subtle"}
+          color={row.role === "owner" ? "#92600A" : "info.fg"}
           px={2.5}
           py={0.5}
           borderRadius="md"
@@ -187,8 +227,8 @@ export default function SettingsPage() {
       header: "Status",
       cell: (row) => (
         <Badge
-          bg={row.status === "active" ? "rgba(16, 185, 129, 0.15)" : "rgba(239, 68, 68, 0.15)"}
-          color={row.status === "active" ? "#34D399" : "#FCA5A5"}
+          bg={row.status === "active" ? "#F0F7F1" : "#FCEEEE"}
+          color={row.status === "active" ? "#2F7A3C" : "#B42318"}
           px={2.5}
           py={0.5}
           borderRadius="md"
@@ -203,7 +243,7 @@ export default function SettingsPage() {
     {
       header: "Joined Date",
       cell: (row) => (
-        <Text fontSize="xs" color="gray.400">
+        <Text fontSize="xs" color="admin.textMuted">
           {relativeTime(row.created_at)}
         </Text>
       ),
@@ -216,10 +256,10 @@ export default function SettingsPage() {
             header: "",
             cell: (row: AdminUser) => (
               <Flex gap={2} justify="flex-end">
-                <Button size="xs" variant="outline" colorPalette="gray" onClick={() => setStatusTarget(row)}>
+                <Button size="xs" variant="outline" borderColor="admin.border" color="admin.text" onClick={() => setStatusTarget(row)}>
                   {row.status === "active" ? "Suspend" : "Reactivate"}
                 </Button>
-                <Button size="xs" variant="outline" colorPalette="red" onClick={() => setDeleteTarget(row)}>
+                <Button size="xs" variant="outline" colorPalette="danger" onClick={() => setDeleteTarget(row)}>
                   Delete
                 </Button>
               </Flex>
@@ -232,96 +272,86 @@ export default function SettingsPage() {
 
   return (
     <Box maxW="1300px" mx="auto">
-      {/* Header */}
-      <Flex justify="space-between" align="center" mb={6} wrap="wrap" gap={4}>
-        <Box>
-          <Heading size="xl" color="white" fontWeight="extrabold" mb={1}>
-            Settings & <Text as="span" className="gradient-text">Admin Access</Text>
-          </Heading>
-          <Text color="gray.400" fontSize="sm">
-            Manage administrative user permissions, system health, and invite team members.
-          </Text>
-        </Box>
+      <Heading size="xl" color="admin.text" fontWeight="extrabold" mb={1}>
+        Settings & Admin Access
+      </Heading>
+      <Text color="admin.textMuted" fontSize="sm" mb={8}>
+        Manage your profile and administrative user permissions.
+      </Text>
 
-        <Button
-          background="linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)"
-          color="white"
-          fontWeight="bold"
-          px={5}
-          borderRadius="xl"
-          onClick={() => setIsInviteOpen(true)}
-        >
-          + Invite Admin User
-        </Button>
-      </Flex>
+      {/* My Profile */}
+      <Box className="admin-card" p={6} borderRadius="2xl" mb={8}>
+        <Heading size="sm" color="admin.text" mb={5} fontWeight="bold">
+          My Profile
+        </Heading>
+        <form onSubmit={handleSaveProfile}>
+          <Flex gap={6} align="center" wrap="wrap">
+            <AvatarUploader value={profileAvatar} onChange={setProfileAvatar} name={profileName || session.admin.email} />
+
+            <VStack align="stretch" gap={3} flex="1" minW="240px">
+              <Box>
+                <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
+                  Full name
+                </Text>
+                <Input
+                  value={profileName}
+                  onChange={(e) => setProfileName(e.target.value)}
+                  placeholder={session.admin.email}
+                  bg="admin.bg"
+                  borderColor="admin.border"
+                  color="admin.text"
+                  borderRadius="xl"
+                />
+              </Box>
+              <Flex align="center" gap={3}>
+                <Text fontSize="xs" color="admin.textMuted">
+                  {session.admin.email}
+                </Text>
+                <Badge
+                  bg={isOwner ? "#FEF3C7" : "info.subtle"}
+                  color={isOwner ? "#92600A" : "info.fg"}
+                  px={2}
+                  py={0.5}
+                  borderRadius="md"
+                  fontSize="xs"
+                  textTransform="capitalize"
+                >
+                  {session.admin.role}
+                </Badge>
+              </Flex>
+              <Flex align="center" gap={3}>
+                <Button type="submit" colorPalette="brand" fontWeight="bold" borderRadius="xl" alignSelf="flex-start" loading={savingProfile}>
+                  Save Profile
+                </Button>
+                {profileMessage && (
+                  <Text fontSize="xs" color="admin.textMuted">
+                    {profileMessage}
+                  </Text>
+                )}
+              </Flex>
+            </VStack>
+          </Flex>
+        </form>
+      </Box>
+
+      <Heading size="sm" color="admin.text" fontWeight="bold" mb={6}>
+        Administrative Accounts ({adminUsers.length})
+      </Heading>
 
       {message && (
         <Box
           p={4}
           mb={6}
           borderRadius="xl"
-          bg={message.type === "success" ? "rgba(16, 185, 129, 0.15)" : "rgba(239, 68, 68, 0.15)"}
+          bg={message.type === "success" ? "#F0F7F1" : "#FCEEEE"}
           border="1px solid"
-          borderColor={message.type === "success" ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)"}
+          borderColor={message.type === "success" ? "#CFE7D2" : "#F5D0CC"}
         >
-          <Text fontSize="sm" color={message.type === "success" ? "#6EE7B7" : "#FCA5A5"}>
+          <Text fontSize="sm" color={message.type === "success" ? "#2F7A3C" : "#B42318"}>
             {message.text}
           </Text>
         </Box>
       )}
-
-      {/* System Status Cards */}
-      <SimpleGrid columns={{ base: 1, md: 3 }} gap={6} mb={8}>
-        <Box className="glass-card" p={5} borderRadius="2xl">
-          <Text fontSize="xs" fontWeight="bold" color="gray.400" textTransform="uppercase" letterSpacing="0.05em" mb={2}>
-            DATABASE STATUS
-          </Text>
-          <Flex align="center" gap={2}>
-            <Box w="10px" h="10px" borderRadius="full" bg="#10B981" boxShadow="0 0 10px #10B981" />
-            <Text fontWeight="bold" color="white">
-              Supabase Postgres Connected
-            </Text>
-          </Flex>
-          <Text fontSize="xs" color="gray.500" mt={2}>
-            Row Level Security (RLS) Enforced
-          </Text>
-        </Box>
-
-        <Box className="glass-card" p={5} borderRadius="2xl">
-          <Text fontSize="xs" fontWeight="bold" color="gray.400" textTransform="uppercase" letterSpacing="0.05em" mb={2}>
-            STORAGE BUCKETS
-          </Text>
-          <Flex align="center" gap={2}>
-            <Box w="10px" h="10px" borderRadius="full" bg="#10B981" boxShadow="0 0 10px #10B981" />
-            <Text fontWeight="bold" color="white">
-              4 Active Storage Buckets
-            </Text>
-          </Flex>
-          <Text fontSize="xs" color="gray.500" mt={2}>
-            team-photos, event-images, startup-images
-          </Text>
-        </Box>
-
-        <Box className="glass-card" p={5} borderRadius="2xl">
-          <Text fontSize="xs" fontWeight="bold" color="gray.400" textTransform="uppercase" letterSpacing="0.05em" mb={2}>
-            YOUR ROLE
-          </Text>
-          <Flex align="center" gap={2}>
-            <Box w="10px" h="10px" borderRadius="full" bg="#818CF8" boxShadow="0 0 10px #818CF8" />
-            <Text fontWeight="bold" color="white" textTransform="capitalize">
-              {session.admin.role}
-            </Text>
-          </Flex>
-          <Text fontSize="xs" color="gray.500" mt={2}>
-            {isOwner ? "Can suspend, reactivate, and delete admins" : "Content access only"}
-          </Text>
-        </Box>
-      </SimpleGrid>
-
-      {/* Admin Users Table */}
-      <Heading size="sm" color="white" mb={4} fontWeight="bold">
-        Administrative Accounts ({adminUsers.length})
-      </Heading>
 
       <DataTable
         data={adminUsers}
@@ -338,27 +368,27 @@ export default function SettingsPage() {
         onClose={() => setIsInviteOpen(false)}
         title="Invite New Admin User"
         onSubmit={handleSendInvite}
-        submitLabel="Send Invitation"
+        submitLabel="Create Account"
         isLoading={sending}
       >
         <VStack align="stretch" gap={4}>
           <Box>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+            <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
               Full Name
             </Text>
             <Input
               value={inviteFullName}
               onChange={(e) => setInviteFullName(e.target.value)}
               placeholder="e.g. Alex Smith"
-              bg="rgba(15, 23, 42, 0.6)"
-              border="1px solid rgba(255, 255, 255, 0.12)"
-              color="white"
+              bg="admin.bg"
+              borderColor="admin.border"
+              color="admin.text"
               borderRadius="xl"
             />
           </Box>
 
           <Box>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+            <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
               Email Address *
             </Text>
             <Input
@@ -366,35 +396,33 @@ export default function SettingsPage() {
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
               placeholder="colleague@i2i-engineering.org"
-              bg="rgba(15, 23, 42, 0.6)"
-              border="1px solid rgba(255, 255, 255, 0.12)"
-              color="white"
+              bg="admin.bg"
+              borderColor="admin.border"
+              color="admin.text"
               borderRadius="xl"
               required
             />
           </Box>
 
           <Box>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+            <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
               Admin Role
             </Text>
             <NativeSelect.Root size="md">
               <NativeSelect.Field
                 value={inviteRole}
                 onChange={(e) => setInviteRole(e.target.value as "admin" | "owner")}
-                bg="#0F172A"
-                borderColor="rgba(255, 255, 255, 0.12)"
-                color="white"
+                bg="admin.bg"
+                borderColor="admin.border"
+                color="admin.text"
                 borderRadius="xl"
               >
-                <option value="admin" style={{ background: "#0F172A", color: "white" }}>Admin</option>
-                {isOwner && (
-                  <option value="owner" style={{ background: "#0F172A", color: "white" }}>Owner</option>
-                )}
+                <option value="admin">Admin</option>
+                {isOwner && <option value="owner">Owner</option>}
               </NativeSelect.Field>
             </NativeSelect.Root>
             {!isOwner && (
-              <Text fontSize="xs" color="gray.500" mt={1}>
+              <Text fontSize="xs" color="admin.textMuted" mt={1}>
                 Only an Owner can invite another Owner.
               </Text>
             )}
@@ -403,51 +431,49 @@ export default function SettingsPage() {
       </ModalFormWrapper>
 
       {/* Temp password, shown exactly once -- not recoverable after this closes */}
-      <Dialog.Root open={!!issuedCredential} onOpenChange={(e) => !e.open && setIssuedCredential(null)}>
-        <Dialog.Backdrop bg="rgba(0, 0, 0, 0.75)" backdropFilter="blur(8px)" />
+      <Dialog.Root
+        open={!!issuedCredential}
+        onOpenChange={(e) => {
+          if (!e.open) {
+            setIssuedCredential(null);
+            setCopied(false);
+          }
+        }}
+      >
+        <Dialog.Backdrop bg="rgba(26, 20, 16, 0.5)" backdropFilter="blur(4px)" />
         <Dialog.Positioner>
-          <Dialog.Content bg="#0F172A" border="1px solid rgba(255, 255, 255, 0.12)" borderRadius="2xl" maxW="440px" p={6} color="white">
+          <Dialog.Content bg="admin.surface" border="1px solid" borderColor="admin.border" borderRadius="2xl" maxW="440px" p={6} color="admin.text">
             <Dialog.Header>
-              <Dialog.Title color="white" fontWeight="bold">
+              <Dialog.Title color="admin.text" fontWeight="bold">
                 Admin account created
               </Dialog.Title>
             </Dialog.Header>
             <Dialog.Body my={3}>
-              <Text color="gray.400" fontSize="sm" mb={4}>
+              <Text color="admin.textMuted" fontSize="sm" mb={4}>
                 Share this temporary password with <b>{issuedCredential?.email}</b> directly (Slack, text, in
                 person) -- not email. It won&apos;t be shown again. They&apos;ll be required to set their own
                 password the first time they sign in.
               </Text>
-              <Code
-                display="block"
-                p={3}
-                borderRadius="lg"
-                fontSize="md"
-                bg="rgba(99, 102, 241, 0.12)"
-                color="#A5B4FC"
-                textAlign="center"
-                userSelect="all"
-              >
+              <Code display="block" p={3} borderRadius="lg" fontSize="md" bg="brand.subtle" color="brand.fg" textAlign="center" userSelect="all">
                 {issuedCredential?.tempPassword}
               </Code>
             </Dialog.Body>
             <Dialog.Footer gap={3}>
               <Button
                 variant="outline"
-                borderColor="rgba(255, 255, 255, 0.15)"
-                color="gray.300"
+                borderColor="admin.border"
+                color="admin.text"
                 onClick={() => {
-                  if (issuedCredential) navigator.clipboard?.writeText(issuedCredential.tempPassword);
+                  if (issuedCredential) {
+                    navigator.clipboard?.writeText(issuedCredential.tempPassword);
+                    setCopied(true);
+                  }
                 }}
               >
-                Copy
+                {copied ? <Check size={16} /> : <Copy size={16} />}
+                {copied ? "Copied" : "Copy"}
               </Button>
-              <Button
-                bg="linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)"
-                color="white"
-                fontWeight="bold"
-                onClick={() => setIssuedCredential(null)}
-              >
+              <Button colorPalette="brand" fontWeight="bold" onClick={() => setIssuedCredential(null)}>
                 Done
               </Button>
             </Dialog.Footer>

@@ -14,6 +14,7 @@ import {
   HStack,
   SimpleGrid,
 } from "@chakra-ui/react";
+import { CalendarDays, MapPin, List, LayoutGrid, Plus } from "lucide-react";
 import { DataTable, ColumnDef } from "@/components/ui/DataTable";
 import { ModalFormWrapper } from "@/components/ui/ModalFormWrapper";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -163,11 +164,11 @@ export default function EventsPage() {
       header: "Event Title",
       cell: (row) => (
         <Box>
-          <Text fontWeight="semibold" color="white" fontSize="sm">
+          <Text fontWeight="semibold" color="admin.text" fontSize="sm">
             {row.title}
           </Text>
           {row.description && (
-            <Text fontSize="xs" color="gray.400" maxW="300px" truncate>
+            <Text fontSize="xs" color="admin.textMuted" maxW="300px" truncate>
               {row.description}
             </Text>
           )}
@@ -180,11 +181,11 @@ export default function EventsPage() {
       header: "Date & Time",
       cell: (row) => (
         <Box>
-          <Text fontWeight="semibold" fontSize="xs" color="#34D399">
-            🗓️ {row.event_date}
-          </Text>
+          <Flex align="center" gap={1.5} fontWeight="semibold" fontSize="xs" color="#2F7A3C">
+            <CalendarDays size={12} /> {row.event_date}
+          </Flex>
           {row.start_time && (
-            <Text fontSize="xs" color="gray.400">
+            <Text fontSize="xs" color="admin.textMuted">
               {row.start_time.substring(0, 5)} {row.end_time ? `- ${row.end_time.substring(0, 5)}` : ""}
             </Text>
           )}
@@ -195,18 +196,16 @@ export default function EventsPage() {
     },
     {
       header: "Location",
-      cell: (row) => <Text fontSize="xs" color="gray.300">📍 {row.location || "Online"}</Text>,
+      cell: (row) => (
+        <Flex align="center" gap={1.5} fontSize="xs" color="admin.text">
+          <MapPin size={12} /> {row.location || "Online"}
+        </Flex>
+      ),
     },
     {
       header: "Status",
       cell: (row) => (
-        <Badge
-          bg={row.is_published ? "rgba(16, 185, 129, 0.15)" : "rgba(245, 158, 11, 0.15)"}
-          color={row.is_published ? "#6EE7B7" : "#FDE68A"}
-          px={2.5}
-          py={0.5}
-          borderRadius="md"
-        >
+        <Badge bg={row.is_published ? "#F0F7F1" : "#FDF6E9"} color={row.is_published ? "#2F7A3C" : "#92600A"} px={2.5} py={0.5} borderRadius="md">
           {row.is_published ? "Published" : "Draft"}
         </Badge>
       ),
@@ -215,12 +214,12 @@ export default function EventsPage() {
       header: "Actions",
       cell: (row) => (
         <Flex gap={2}>
-          <Button size="xs" variant="outline" borderColor="rgba(255, 255, 255, 0.15)" color="gray.200" onClick={() => openEditModal(row)}>
+          <Button size="xs" variant="outline" borderColor="admin.border" color="admin.text" onClick={() => openEditModal(row)}>
             Edit
           </Button>
           <Button
             size="xs"
-            colorPalette="red"
+            colorPalette="danger"
             variant="ghost"
             onClick={() => {
               setDeletingId(row.id);
@@ -239,10 +238,10 @@ export default function EventsPage() {
       {/* Header */}
       <Flex justify="space-between" align="center" mb={6} wrap="wrap" gap={4}>
         <Box>
-          <Heading size="xl" color="white" fontWeight="extrabold" mb={1}>
-            Events & <Text as="span" className="gradient-text-cyan">Hackathons</Text>
+          <Heading size="xl" color="admin.text" fontWeight="extrabold" mb={1}>
+            Events & Hackathons
           </Heading>
-          <Text color="gray.400" fontSize="sm">
+          <Text color="admin.textMuted" fontSize="sm">
             Schedule workshops, guest lectures, set registration URLs, and switch calendar views.
           </Text>
         </Box>
@@ -251,24 +250,24 @@ export default function EventsPage() {
           <Button
             size="sm"
             borderRadius="xl"
-            bg={viewMode === "table" ? "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)" : "rgba(15, 23, 42, 0.6)"}
+            bg={viewMode === "table" ? "brand.solid" : "admin.surface"}
             border="1px solid"
-            borderColor={viewMode === "table" ? "transparent" : "rgba(255, 255, 255, 0.1)"}
-            color="white"
+            borderColor={viewMode === "table" ? "transparent" : "admin.border"}
+            color={viewMode === "table" ? "white" : "admin.text"}
             onClick={() => setViewMode("table")}
           >
-            📋 Table View
+            <List size={15} /> Table View
           </Button>
           <Button
             size="sm"
             borderRadius="xl"
-            bg={viewMode === "calendar" ? "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)" : "rgba(15, 23, 42, 0.6)"}
+            bg={viewMode === "calendar" ? "brand.solid" : "admin.surface"}
             border="1px solid"
-            borderColor={viewMode === "calendar" ? "transparent" : "rgba(255, 255, 255, 0.1)"}
-            color="white"
+            borderColor={viewMode === "calendar" ? "transparent" : "admin.border"}
+            color={viewMode === "calendar" ? "white" : "admin.text"}
             onClick={() => setViewMode("calendar")}
           >
-            📅 Grid View
+            <LayoutGrid size={15} /> Grid View
           </Button>
         </HStack>
       </Flex>
@@ -286,58 +285,45 @@ export default function EventsPage() {
       ) : (
         <Box>
           <Flex justify="space-between" align="center" mb={4}>
-            <Text fontWeight="semibold" color="gray.300">
+            <Text fontWeight="semibold" color="admin.text">
               Event Cards Gallery
             </Text>
-            <Button
-              background="linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)"
-              color="white"
-              size="sm"
-              borderRadius="xl"
-              onClick={openCreateModal}
-            >
-              + Create Event
+            <Button colorPalette="brand" size="sm" borderRadius="xl" onClick={openCreateModal}>
+              <Plus size={15} /> Create Event
             </Button>
           </Flex>
 
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
             {events.map((ev) => (
-              <Box key={ev.id} className="glass-card" p={6} borderRadius="2xl">
+              <Box key={ev.id} className="admin-card" p={6} borderRadius="2xl">
                 <Flex justify="space-between" align="flex-start" mb={3}>
-                  <Badge
-                    bg={ev.is_published ? "rgba(16, 185, 129, 0.15)" : "rgba(245, 158, 11, 0.15)"}
-                    color={ev.is_published ? "#6EE7B7" : "#FDE68A"}
-                    px={2.5}
-                    py={0.5}
-                    borderRadius="md"
-                    fontSize="xs"
-                  >
+                  <Badge bg={ev.is_published ? "#F0F7F1" : "#FDF6E9"} color={ev.is_published ? "#2F7A3C" : "#92600A"} px={2.5} py={0.5} borderRadius="md" fontSize="xs">
                     {ev.is_published ? "Published" : "Draft"}
                   </Badge>
-                  <Text fontSize="xs" fontWeight="bold" color="#34D399">
-                    🗓️ {ev.event_date}
-                  </Text>
+                  <Flex align="center" gap={1} fontSize="xs" fontWeight="bold" color="#2F7A3C">
+                    <CalendarDays size={12} /> {ev.event_date}
+                  </Flex>
                 </Flex>
 
-                <Heading size="sm" color="white" mb={2}>
+                <Heading size="sm" color="admin.text" mb={2}>
                   {ev.title}
                 </Heading>
 
-                <Text fontSize="xs" color="gray.400" mb={4} lineClamp={2}>
+                <Text fontSize="xs" color="admin.textMuted" mb={4} lineClamp={2}>
                   {ev.description || "No description provided."}
                 </Text>
 
-                <Text fontSize="xs" color="gray.300" mb={4}>
-                  📍 {ev.location || "Location TBD"}
-                </Text>
+                <Flex align="center" gap={1} fontSize="xs" color="admin.text" mb={4}>
+                  <MapPin size={12} /> {ev.location || "Location TBD"}
+                </Flex>
 
-                <Flex justify="flex-end" gap={2} pt={4} borderTop="1px solid rgba(255, 255, 255, 0.08)">
-                  <Button size="xs" variant="outline" borderColor="rgba(255, 255, 255, 0.15)" color="gray.200" onClick={() => openEditModal(ev)}>
+                <Flex justify="flex-end" gap={2} pt={4} borderTop="1px solid" borderColor="admin.border">
+                  <Button size="xs" variant="outline" borderColor="admin.border" color="admin.text" onClick={() => openEditModal(ev)}>
                     Edit
                   </Button>
                   <Button
                     size="xs"
-                    colorPalette="red"
+                    colorPalette="danger"
                     variant="ghost"
                     onClick={() => {
                       setDeletingId(ev.id);
@@ -363,32 +349,34 @@ export default function EventsPage() {
       >
         <VStack align="stretch" gap={4}>
           <Box>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+            <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
               Event Title *
             </Text>
             <Input
               value={editingEvent?.title || ""}
               onChange={(e) => setEditingEvent((prev) => ({ ...prev, title: e.target.value }))}
               placeholder="e.g. AI Innovation Summit"
-              bg="rgba(15, 23, 42, 0.6)"
-              border="1px solid rgba(255, 255, 255, 0.12)"
-              color="white"
+              bg="admin.bg"
+              border="1px solid"
+              borderColor="admin.border"
+              color="admin.text"
               borderRadius="xl"
               required
             />
           </Box>
 
           <Box>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+            <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
               Description
             </Text>
             <Textarea
               value={editingEvent?.description || ""}
               onChange={(e) => setEditingEvent((prev) => ({ ...prev, description: e.target.value }))}
               placeholder="Describe event agenda, speakers, and instructions..."
-              bg="rgba(15, 23, 42, 0.6)"
-              border="1px solid rgba(255, 255, 255, 0.12)"
-              color="white"
+              bg="admin.bg"
+              border="1px solid"
+              borderColor="admin.border"
+              color="admin.text"
               borderRadius="xl"
               rows={3}
             />
@@ -396,63 +384,67 @@ export default function EventsPage() {
 
           <HStack gap={4}>
             <Box flex="1">
-              <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+              <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
                 Event Date *
               </Text>
               <Input
                 type="date"
                 value={editingEvent?.event_date || ""}
                 onChange={(e) => setEditingEvent((prev) => ({ ...prev, event_date: e.target.value }))}
-                bg="rgba(15, 23, 42, 0.6)"
-                border="1px solid rgba(255, 255, 255, 0.12)"
-                color="white"
+                bg="admin.bg"
+                border="1px solid"
+                borderColor="admin.border"
+                color="admin.text"
                 borderRadius="xl"
                 required
               />
             </Box>
 
             <Box flex="1">
-              <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+              <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
                 Start Time
               </Text>
               <Input
                 type="time"
                 value={editingEvent?.start_time || ""}
                 onChange={(e) => setEditingEvent((prev) => ({ ...prev, start_time: e.target.value }))}
-                bg="rgba(15, 23, 42, 0.6)"
-                border="1px solid rgba(255, 255, 255, 0.12)"
-                color="white"
+                bg="admin.bg"
+                border="1px solid"
+                borderColor="admin.border"
+                color="admin.text"
                 borderRadius="xl"
               />
             </Box>
           </HStack>
 
           <Box>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+            <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
               Location / Venue
             </Text>
             <Input
               value={editingEvent?.location || ""}
               onChange={(e) => setEditingEvent((prev) => ({ ...prev, location: e.target.value }))}
               placeholder="e.g. Room 302 or Online Zoom Link"
-              bg="rgba(15, 23, 42, 0.6)"
-              border="1px solid rgba(255, 255, 255, 0.12)"
-              color="white"
+              bg="admin.bg"
+              border="1px solid"
+              borderColor="admin.border"
+              color="admin.text"
               borderRadius="xl"
             />
           </Box>
 
           <Box>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+            <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
               Registration Link
             </Text>
             <Input
               value={editingEvent?.registration_url || ""}
               onChange={(e) => setEditingEvent((prev) => ({ ...prev, registration_url: e.target.value }))}
               placeholder="https://eventbrite.com/..."
-              bg="rgba(15, 23, 42, 0.6)"
-              border="1px solid rgba(255, 255, 255, 0.12)"
-              color="white"
+              bg="admin.bg"
+              border="1px solid"
+              borderColor="admin.border"
+              color="admin.text"
               borderRadius="xl"
             />
           </Box>

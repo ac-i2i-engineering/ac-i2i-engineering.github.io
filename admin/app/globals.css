@@ -1,65 +1,68 @@
 :root {
-  --bg-dark: #0b0f19;
-  --card-bg: rgba(17, 24, 39, 0.75);
-  --card-border: rgba(255, 255, 255, 0.08);
+  --admin-bg: #faf7f3;
+  --admin-surface: #ffffff;
+  --admin-border: #ede4da;
 }
 
 body {
-  background-color: var(--bg-dark);
-  color: #f3f4f6;
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  background-color: var(--admin-bg);
+  color: #1a1410;
+  font-family: var(--font-inter), sans-serif;
   overflow-x: hidden;
   margin: 0;
   padding: 0;
 }
 
-/* Custom Glassmorphism Utility */
-.glass-panel {
-  background: rgba(17, 24, 39, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* Card style shared across the admin panel -- matches the public site's
+   .index-card/.team-card (white surface, soft shadow, rounded corners)
+   instead of the glassmorphism/dark-glow look this used to have. */
+.admin-card {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-.glass-card {
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+.admin-card:hover {
+  border-color: #f5c89e;
+  box-shadow: 0 8px 24px -8px rgba(233, 73, 23, 0.18);
 }
 
-.glass-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(99, 102, 241, 0.4);
-  box-shadow: 0 12px 30px -10px rgba(99, 102, 241, 0.25);
+.admin-panel {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
 }
 
-/* Gradient Text Effect */
-.gradient-text {
-  background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #f472b6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Media Manager gallery -- CSS multi-column masonry so each photo keeps its
+   own aspect ratio instead of being force-cropped into a fixed-height box. */
+.media-masonry {
+  column-count: 1;
+  column-gap: 24px;
+}
+@media (min-width: 480px) {
+  .media-masonry { column-count: 2; }
+}
+@media (min-width: 768px) {
+  .media-masonry { column-count: 3; }
+}
+@media (min-width: 1024px) {
+  .media-masonry { column-count: 4; }
+}
+.media-masonry-item {
+  break-inside: avoid;
+  margin-bottom: 24px;
 }
 
-.gradient-text-cyan {
-  background: linear-gradient(135deg, #38bdf8 0%, #34d399 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b0f19;
+  background: var(--admin-bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #ded0c0;
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #c9b7a2;
 }

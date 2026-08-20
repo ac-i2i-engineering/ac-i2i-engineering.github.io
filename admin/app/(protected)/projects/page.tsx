@@ -13,6 +13,7 @@ import {
   VStack,
   HStack,
 } from "@chakra-ui/react";
+import { ExternalLink } from "lucide-react";
 import { DataTable, ColumnDef } from "@/components/ui/DataTable";
 import { ModalFormWrapper } from "@/components/ui/ModalFormWrapper";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -183,10 +184,10 @@ export default function ProjectsPage() {
       header: "Project Title",
       cell: (row) => (
         <Box>
-          <Text fontWeight="semibold" color="white" fontSize="sm">
+          <Text fontWeight="semibold" color="admin.text" fontSize="sm">
             {row.title}
           </Text>
-          <Text fontSize="xs" color="gray.500">
+          <Text fontSize="xs" color="admin.textMuted">
             /{row.slug}
           </Text>
         </Box>
@@ -199,7 +200,7 @@ export default function ProjectsPage() {
       cell: (row) => (
         <Flex wrap="wrap" gap={1.5}>
           {(row.tags || []).map((tag, idx) => (
-            <Badge key={idx} bg="rgba(99, 102, 241, 0.15)" color="#A5B4FC" border="1px solid rgba(99, 102, 241, 0.3)" px={2} py={0.5} borderRadius="md" fontSize="xs">
+            <Badge key={idx} bg="info.subtle" color="info.fg" px={2} py={0.5} borderRadius="md" fontSize="xs">
               {tag}
             </Badge>
           ))}
@@ -212,15 +213,15 @@ export default function ProjectsPage() {
         <HStack gap={2}>
           {row.github_url && (
             <a href={row.github_url} target="_blank" rel="noreferrer">
-              <Button size="xs" variant="outline" borderColor="rgba(255, 255, 255, 0.15)" color="gray.300">
-                GitHub ↗
+              <Button size="xs" variant="outline" borderColor="admin.border" color="admin.text">
+                GitHub <ExternalLink size={11} />
               </Button>
             </a>
           )}
           {row.demo_url && (
             <a href={row.demo_url} target="_blank" rel="noreferrer">
-              <Button size="xs" bg="rgba(59, 130, 246, 0.2)" color="#60A5FA" border="1px solid rgba(59, 130, 246, 0.4)">
-                Demo ↗
+              <Button size="xs" bg="info.subtle" color="info.fg">
+                Demo <ExternalLink size={11} />
               </Button>
             </a>
           )}
@@ -230,13 +231,7 @@ export default function ProjectsPage() {
     {
       header: "Status",
       cell: (row) => (
-        <Badge
-          bg={row.is_published ? "rgba(16, 185, 129, 0.15)" : "rgba(245, 158, 11, 0.15)"}
-          color={row.is_published ? "#6EE7B7" : "#FDE68A"}
-          px={2.5}
-          py={0.5}
-          borderRadius="md"
-        >
+        <Badge bg={row.is_published ? "#F0F7F1" : "#FDF6E9"} color={row.is_published ? "#2F7A3C" : "#92600A"} px={2.5} py={0.5} borderRadius="md">
           {row.is_published ? "Published" : "Draft"}
         </Badge>
       ),
@@ -245,12 +240,12 @@ export default function ProjectsPage() {
       header: "Actions",
       cell: (row) => (
         <Flex gap={2}>
-          <Button size="xs" variant="outline" borderColor="rgba(255, 255, 255, 0.15)" color="gray.200" onClick={() => openEditModal(row)}>
+          <Button size="xs" variant="outline" borderColor="admin.border" color="admin.text" onClick={() => openEditModal(row)}>
             Edit
           </Button>
           <Button
             size="xs"
-            colorPalette="red"
+            colorPalette="danger"
             variant="ghost"
             onClick={() => {
               setDeletingId(row.id);
@@ -269,10 +264,10 @@ export default function ProjectsPage() {
       {/* Header */}
       <Flex justify="space-between" align="center" mb={6} wrap="wrap" gap={4}>
         <Box>
-          <Heading size="xl" color="white" fontWeight="extrabold" mb={1}>
-            Projects & <Text as="span" className="gradient-text">Startups</Text>
+          <Heading size="xl" color="admin.text" fontWeight="extrabold" mb={1}>
+            Projects & Startups
           </Heading>
-          <Text color="gray.400" fontSize="sm">
+          <Text color="admin.textMuted" fontSize="sm">
             Manage incubated student projects, GitHub repositories, demo links, and tag chips.
           </Text>
         </Box>
@@ -298,54 +293,57 @@ export default function ProjectsPage() {
       >
         <VStack align="stretch" gap={4}>
           <Box>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+            <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
               Project Title *
             </Text>
             <Input
               value={editingStartup?.title || ""}
               onChange={(e) => handleTitleChange(e.target.value)}
               placeholder="e.g. EcoGrid Energy"
-              bg="rgba(15, 23, 42, 0.6)"
-              border="1px solid rgba(255, 255, 255, 0.12)"
-              color="white"
+              bg="admin.bg"
+              border="1px solid"
+              borderColor="admin.border"
+              color="admin.text"
               borderRadius="xl"
               required
             />
           </Box>
 
           <Box>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+            <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
               URL Slug
             </Text>
             <Input
               value={editingStartup?.slug || ""}
               onChange={(e) => setEditingStartup((prev) => ({ ...prev, slug: e.target.value }))}
               placeholder="auto-generated-slug"
-              bg="rgba(15, 23, 42, 0.6)"
-              border="1px solid rgba(255, 255, 255, 0.12)"
-              color="white"
+              bg="admin.bg"
+              border="1px solid"
+              borderColor="admin.border"
+              color="admin.text"
               borderRadius="xl"
             />
           </Box>
 
           <Box>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+            <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
               Description
             </Text>
             <Textarea
               value={editingStartup?.description || ""}
               onChange={(e) => setEditingStartup((prev) => ({ ...prev, description: e.target.value }))}
               placeholder="Describe the project mission, tech stack, and key metrics..."
-              bg="rgba(15, 23, 42, 0.6)"
-              border="1px solid rgba(255, 255, 255, 0.12)"
-              color="white"
+              bg="admin.bg"
+              border="1px solid"
+              borderColor="admin.border"
+              color="admin.text"
               borderRadius="xl"
               rows={3}
             />
           </Box>
 
           <Box>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+            <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
               Category Tags (Chips)
             </Text>
             <TagInput
@@ -356,30 +354,32 @@ export default function ProjectsPage() {
 
           <HStack gap={4}>
             <Box flex="1">
-              <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+              <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
                 GitHub Repository URL
               </Text>
               <Input
                 value={editingStartup?.github_url || ""}
                 onChange={(e) => setEditingStartup((prev) => ({ ...prev, github_url: e.target.value }))}
                 placeholder="https://github.com/..."
-                bg="rgba(15, 23, 42, 0.6)"
-                border="1px solid rgba(255, 255, 255, 0.12)"
-                color="white"
+                bg="admin.bg"
+                border="1px solid"
+                borderColor="admin.border"
+                color="admin.text"
                 borderRadius="xl"
               />
             </Box>
             <Box flex="1">
-              <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+              <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
                 Demo / Website URL
               </Text>
               <Input
                 value={editingStartup?.demo_url || ""}
                 onChange={(e) => setEditingStartup((prev) => ({ ...prev, demo_url: e.target.value }))}
                 placeholder="https://myproject.com"
-                bg="rgba(15, 23, 42, 0.6)"
-                border="1px solid rgba(255, 255, 255, 0.12)"
-                color="white"
+                bg="admin.bg"
+                border="1px solid"
+                borderColor="admin.border"
+                color="admin.text"
                 borderRadius="xl"
               />
             </Box>

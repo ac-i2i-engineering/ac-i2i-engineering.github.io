@@ -74,6 +74,7 @@ export interface Media {
   attached_to_type: MediaAttachedToType | null;
   attached_to_id: string | null;
   sort_order: number;
+  is_published: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -85,6 +86,7 @@ export interface AdminUser {
   id: string;
   email: string;
   full_name: string | null;
+  avatar_url: string | null;
   role: AdminRole;
   status: AdminStatus;
   must_reset_password: boolean;
@@ -111,4 +113,5 @@ export const STORAGE_BUCKETS = {
   eventImages: "event-images",
   startupImages: "startup-images",
   mediaGallery: "media-gallery",
+  adminAvatars: "admin-avatars",
 } as const;

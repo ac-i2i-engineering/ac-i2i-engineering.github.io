@@ -56,48 +56,52 @@ export default function SetPasswordPage() {
   }
 
   return (
-    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="#0B0F19">
-      <Box w="full" maxW="sm" p={8} borderRadius="lg" bg="#111827" borderWidth="1px" borderColor="whiteAlpha.200">
-        <Heading size="md" mb={1} color="white">
+    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="admin.bg">
+      <Box w="full" maxW="sm" p={8} borderRadius="2xl" bg="admin.surface" borderWidth="1px" borderColor="admin.border" boxShadow="0 20px 50px -20px rgba(26, 20, 16, 0.2)">
+        <Heading size="md" mb={1} color="admin.text">
           Set your password
         </Heading>
-        <Text fontSize="sm" color="gray.400" mb={6}>
+        <Text fontSize="sm" color="admin.textMuted" mb={6}>
           Choose a password for your i2i admin account.
         </Text>
 
         <form onSubmit={handleSubmit}>
           <Stack gap={4}>
             <Field.Root>
-              <Field.Label color="gray.300">New password</Field.Label>
+              <Field.Label color="admin.text">New password</Field.Label>
               <Input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="new-password"
-                color="white"
+                color="admin.text"
+                borderColor="admin.border"
+                _focus={{ borderColor: "brand.emphasized" }}
               />
             </Field.Root>
 
             <Field.Root>
-              <Field.Label color="gray.300">Confirm password</Field.Label>
+              <Field.Label color="admin.text">Confirm password</Field.Label>
               <Input
                 type="password"
                 required
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 autoComplete="new-password"
-                color="white"
+                color="admin.text"
+                borderColor="admin.border"
+                _focus={{ borderColor: "brand.emphasized" }}
               />
             </Field.Root>
 
             {error && (
-              <Text fontSize="sm" color="red.400">
+              <Text fontSize="sm" color="red.500">
                 {error}
               </Text>
             )}
 
-            <Button type="submit" colorPalette="orange" loading={loading}>
+            <Button type="submit" colorPalette="brand" loading={loading}>
               Set password and sign in
             </Button>
           </Stack>

@@ -14,6 +14,7 @@ import {
   Switch,
   Image,
 } from "@chakra-ui/react";
+import { Star } from "lucide-react";
 import { DataTable, ColumnDef } from "@/components/ui/DataTable";
 import { ModalFormWrapper } from "@/components/ui/ModalFormWrapper";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -161,20 +162,20 @@ export default function TeamPage() {
       header: "Member",
       cell: (row) => (
         <Flex align="center" gap={3}>
-          <Box w="40px" h="40px" borderRadius="full" overflow="hidden" bg="gray.800" border="2px solid rgba(99, 102, 241, 0.4)" flexShrink={0}>
+          <Box w="40px" h="40px" borderRadius="full" overflow="hidden" bg="brand.subtle" border="2px solid" borderColor="admin.border" flexShrink={0}>
             {row.image_url ? (
               <Image src={row.image_url} alt={row.name} w="100%" h="100%" objectFit="cover" />
             ) : (
-              <Flex align="center" justify="center" h="100%" color="indigo.300" fontSize="sm" fontWeight="bold">
+              <Flex align="center" justify="center" h="100%" color="brand.fg" fontSize="sm" fontWeight="bold">
                 {row.name.charAt(0)}
               </Flex>
             )}
           </Box>
           <Box>
-            <Text fontWeight="semibold" color="white" fontSize="sm">
+            <Text fontWeight="semibold" color="admin.text" fontSize="sm">
               {row.name}
             </Text>
-            <Text fontSize="xs" color="gray.400">
+            <Text fontSize="xs" color="admin.textMuted">
               {row.role || "Member"}
             </Text>
           </Box>
@@ -188,7 +189,7 @@ export default function TeamPage() {
       cell: (row) => {
         const dept = departments.find((d) => d.id === row.department_id);
         return (
-          <Badge bg="rgba(99, 102, 241, 0.15)" color="#A5B4FC" border="1px solid rgba(99, 102, 241, 0.3)" px={2.5} py={0.5} borderRadius="md">
+          <Badge bg="info.subtle" color="info.fg" px={2.5} py={0.5} borderRadius="md">
             {dept?.title || "General"}
           </Badge>
         );
@@ -198,19 +199,19 @@ export default function TeamPage() {
       header: "Lead",
       cell: (row) =>
         row.is_lead ? (
-          <Badge bg="rgba(168, 85, 247, 0.2)" color="#C084FC" border="1px solid rgba(168, 85, 247, 0.4)" px={2.5} py={0.5} borderRadius="md">
-            ★ Dept Lead
+          <Badge bg="#FEF3C7" color="#92600A" px={2.5} py={0.5} borderRadius="md" display="flex" alignItems="center" gap={1} w="fit-content">
+            <Star size={11} fill="#92600A" /> Dept Lead
           </Badge>
         ) : (
-          <Text fontSize="xs" color="gray.600">—</Text>
+          <Text fontSize="xs" color="admin.textMuted">—</Text>
         ),
     },
     {
       header: "Status",
       cell: (row) => (
         <Badge
-          bg={row.is_published ? "rgba(16, 185, 129, 0.15)" : "rgba(245, 158, 11, 0.15)"}
-          color={row.is_published ? "#6EE7B7" : "#FDE68A"}
+          bg={row.is_published ? "#F0F7F1" : "#FDF6E9"}
+          color={row.is_published ? "#2F7A3C" : "#92600A"}
           px={2.5}
           py={0.5}
           borderRadius="md"
@@ -223,12 +224,12 @@ export default function TeamPage() {
       header: "Actions",
       cell: (row) => (
         <Flex gap={2}>
-          <Button size="xs" variant="outline" borderColor="rgba(255, 255, 255, 0.15)" color="gray.200" onClick={() => openEditModal(row)}>
+          <Button size="xs" variant="outline" borderColor="admin.border" color="admin.text" onClick={() => openEditModal(row)}>
             Edit
           </Button>
           <Button
             size="xs"
-            colorPalette="red"
+            colorPalette="danger"
             variant="ghost"
             onClick={() => {
               setDeletingId(row.id);
@@ -247,10 +248,10 @@ export default function TeamPage() {
       {/* Header */}
       <Flex justify="space-between" align="center" mb={6} wrap="wrap" gap={4}>
         <Box>
-          <Heading size="xl" color="white" fontWeight="extrabold" mb={1}>
-            Teams & Members <Text as="span" className="gradient-text">Management</Text>
+          <Heading size="xl" color="admin.text" fontWeight="extrabold" mb={1}>
+            Team Members
           </Heading>
-          <Text color="gray.400" fontSize="sm">
+          <Text color="admin.textMuted" fontSize="sm">
             Organize team members, assign department leads, and manage profile photos.
           </Text>
         </Box>
@@ -261,10 +262,10 @@ export default function TeamPage() {
         <Button
           size="sm"
           borderRadius="xl"
-          bg={activeDeptFilter === "all" ? "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)" : "rgba(15, 23, 42, 0.6)"}
+          bg={activeDeptFilter === "all" ? "brand.solid" : "admin.surface"}
           border="1px solid"
-          borderColor={activeDeptFilter === "all" ? "transparent" : "rgba(255, 255, 255, 0.1)"}
-          color="white"
+          borderColor={activeDeptFilter === "all" ? "transparent" : "admin.border"}
+          color={activeDeptFilter === "all" ? "white" : "admin.text"}
           onClick={() => setActiveDeptFilter("all")}
         >
           All Members ({members.length})
@@ -277,10 +278,10 @@ export default function TeamPage() {
               key={dept.id}
               size="sm"
               borderRadius="xl"
-              bg={isActive ? "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)" : "rgba(15, 23, 42, 0.6)"}
+              bg={isActive ? "brand.solid" : "admin.surface"}
               border="1px solid"
-              borderColor={isActive ? "transparent" : "rgba(255, 255, 255, 0.1)"}
-              color="white"
+              borderColor={isActive ? "transparent" : "admin.border"}
+              color={isActive ? "white" : "admin.text"}
               onClick={() => setActiveDeptFilter(dept.id)}
             >
               {dept.title} ({count})
@@ -309,51 +310,53 @@ export default function TeamPage() {
       >
         <VStack align="stretch" gap={4}>
           <Box>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+            <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
               Full Name *
             </Text>
             <Input
               value={editingMember?.name || ""}
               onChange={(e) => setEditingMember((prev) => ({ ...prev, name: e.target.value }))}
               placeholder="e.g. Jane Doe"
-              bg="rgba(15, 23, 42, 0.6)"
-              border="1px solid rgba(255, 255, 255, 0.12)"
-              color="white"
+              bg="admin.bg"
+              border="1px solid"
+              borderColor="admin.border"
+              color="admin.text"
               borderRadius="xl"
               required
             />
           </Box>
 
           <Box>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+            <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
               Role / Title
             </Text>
             <Input
               value={editingMember?.role || ""}
               onChange={(e) => setEditingMember((prev) => ({ ...prev, role: e.target.value }))}
               placeholder="e.g. Senior Software Engineer"
-              bg="rgba(15, 23, 42, 0.6)"
-              border="1px solid rgba(255, 255, 255, 0.12)"
-              color="white"
+              bg="admin.bg"
+              border="1px solid"
+              borderColor="admin.border"
+              color="admin.text"
               borderRadius="xl"
             />
           </Box>
 
           <Box>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.300" mb={1}>
+            <Text fontSize="sm" fontWeight="semibold" color="admin.text" mb={1}>
               Department
             </Text>
             <NativeSelect.Root size="md">
               <NativeSelect.Field
                 value={editingMember?.department_id || ""}
                 onChange={(e) => setEditingMember((prev) => ({ ...prev, department_id: e.target.value }))}
-                bg="#0F172A"
-                borderColor="rgba(255, 255, 255, 0.12)"
-                color="white"
+                bg="admin.bg"
+                borderColor="admin.border"
+                color="admin.text"
                 borderRadius="xl"
               >
                 {departments.map((d) => (
-                  <option key={d.id} value={d.id} style={{ background: "#0F172A", color: "white" }}>
+                  <option key={d.id} value={d.id}>
                     {d.title}
                   </option>
                 ))}
@@ -368,13 +371,14 @@ export default function TeamPage() {
             label="Profile Photo"
           />
 
-          <Flex align="center" justify="space-between" p={4} border="1px solid rgba(255, 255, 255, 0.12)" borderRadius="xl" bg="rgba(15, 23, 42, 0.6)">
-            <Text fontSize="sm" fontWeight="semibold" color="gray.300">
+          <Flex align="center" justify="space-between" p={4} border="1px solid" borderColor="admin.border" borderRadius="xl" bg="admin.bg">
+            <Text fontSize="sm" fontWeight="semibold" color="admin.text">
               Department Lead Flag
             </Text>
             <Switch.Root
               checked={editingMember?.is_lead ?? false}
               onCheckedChange={(e) => setEditingMember((prev) => ({ ...prev, is_lead: e.checked }))}
+              colorPalette="brand"
             >
               <Switch.HiddenInput />
               <Switch.Control>

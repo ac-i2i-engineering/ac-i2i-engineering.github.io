@@ -10,6 +10,7 @@ import {
   Text,
   Spinner,
 } from "@chakra-ui/react";
+import { Plus, ChevronUp, ChevronDown, Search } from "lucide-react";
 
 export interface ColumnDef<T> {
   header: string;
@@ -27,6 +28,10 @@ interface DataTableProps<T> {
   addButtonLabel?: string;
 }
 
+// Generic row type varies per page (TeamMember/Event/Startup/AdminUser/...),
+// none declare an index signature, so a stricter bound than `any` here
+// rejects all of them.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function DataTable<T extends Record<string, any>>({
   data,
   columns,
@@ -81,15 +86,13 @@ export function DataTable<T extends Record<string, any>>({
   };
 
   return (
-    <Box
-      className="glass-panel"
-      borderRadius="2xl"
-      p={{ base: 4, md: 6 }}
-      boxShadow="0 20px 40px rgba(0, 0, 0, 0.4)"
-    >
+    <Box className="admin-panel" borderRadius="2xl" p={{ base: 4, md: 6 }}>
       {/* Header Bar */}
       <Flex justify="space-between" align="center" mb={6} gap={4} wrap="wrap">
-        <Box maxW="360px" w="100%">
+        <Box maxW="360px" w="100%" position="relative">
+          <Box position="absolute" left={3} top="50%" transform="translateY(-50%)" color="admin.textMuted" pointerEvents="none">
+            <Search size={16} />
+          </Box>
           <Input
             placeholder={searchPlaceholder}
             value={searchTerm}
@@ -97,34 +100,24 @@ export function DataTable<T extends Record<string, any>>({
               setSearchTerm(e.target.value);
               setPage(1);
             }}
-            bg="rgba(15, 23, 42, 0.6)"
-            border="1px solid rgba(255, 255, 255, 0.12)"
-            color="white"
+            bg="admin.bg"
+            border="1px solid"
+            borderColor="admin.border"
+            color="admin.text"
             borderRadius="xl"
-            px={4}
+            pl={9}
+            pr={4}
             py={2.5}
             fontSize="sm"
-            _placeholder={{ color: "gray.500" }}
-            _focus={{ borderColor: "#818CF8", boxShadow: "0 0 12px rgba(99, 102, 241, 0.3)" }}
+            _placeholder={{ color: "admin.textMuted" }}
+            _focus={{ borderColor: "brand.emphasized", boxShadow: "0 0 0 3px {colors.brand.subtle}" }}
           />
         </Box>
 
         {onAddClick && (
-          <Button
-            background="linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)"
-            color="white"
-            fontWeight="bold"
-            px={6}
-            py={2.5}
-            borderRadius="xl"
-            boxShadow="0 4px 15px rgba(99, 102, 241, 0.4)"
-            _hover={{
-              transform: "translateY(-1px)",
-              boxShadow: "0 6px 20px rgba(99, 102, 241, 0.6)",
-            }}
-            onClick={onAddClick}
-          >
-            + {addButtonLabel}
+          <Button colorPalette="brand" fontWeight="bold" px={6} py={2.5} borderRadius="xl" onClick={onAddClick}>
+            <Plus size={16} />
+            {addButtonLabel}
           </Button>
         )}
       </Flex>
@@ -133,20 +126,20 @@ export function DataTable<T extends Record<string, any>>({
       <Box overflowX="auto">
         {isLoading ? (
           <Flex justify="center" align="center" py={16} gap={3}>
-            <Spinner size="md" color="indigo.400" />
-            <Text color="gray.400" fontSize="sm">
+            <Spinner size="md" color="brand.solid" />
+            <Text color="admin.textMuted" fontSize="sm">
               Loading records...
             </Text>
           </Flex>
         ) : (
-          <Table.Root size="md" variant="outline" borderColor="rgba(255, 255, 255, 0.08)">
-            <Table.Header bg="rgba(15, 23, 42, 0.8)">
-              <Table.Row borderBottom="1px solid rgba(255, 255, 255, 0.1)">
+          <Table.Root size="md" variant="outline" borderColor="admin.border">
+            <Table.Header bg="admin.bg">
+              <Table.Row borderBottom="1px solid" borderColor="admin.border">
                 {columns.map((col, idx) => (
                   <Table.ColumnHeader
                     key={idx}
                     fontWeight="bold"
-                    color="gray.400"
+                    color="admin.textMuted"
                     fontSize="xs"
                     textTransform="uppercase"
                     letterSpacing="0.05em"
@@ -154,11 +147,15 @@ export function DataTable<T extends Record<string, any>>({
                     cursor={col.sortable ? "pointer" : "default"}
                     onClick={() => col.sortable && handleSort(col.accessorKey)}
                   >
-                    <Flex align="center" gap={1.5}>
+                    <Flex align="center" gap={1}>
                       {col.header}
-                      {col.sortable && sortKey === col.accessorKey && (
-                        <Text color="#818CF8">{sortOrder === "asc" ? "▲" : "▼"}</Text>
-                      )}
+                      {col.sortable &&
+                        sortKey === col.accessorKey &&
+                        (sortOrder === "asc" ? (
+                          <ChevronUp size={13} color="var(--chakra-colors-brand-fg)" />
+                        ) : (
+                          <ChevronDown size={13} color="var(--chakra-colors-brand-fg)" />
+                        ))}
                     </Flex>
                   </Table.ColumnHeader>
                 ))}
@@ -169,19 +166,20 @@ export function DataTable<T extends Record<string, any>>({
               {paginatedData.length === 0 ? (
                 <Table.Row>
                   <Table.Cell colSpan={columns.length} textAlign="center" py={12}>
-                    <Text color="gray.500">No matching records found.</Text>
+                    <Text color="admin.textMuted">No matching records found.</Text>
                   </Table.Cell>
                 </Table.Row>
               ) : (
                 paginatedData.map((row, rowIdx) => (
                   <Table.Row
                     key={row.id ?? rowIdx}
-                    borderBottom="1px solid rgba(255, 255, 255, 0.06)"
+                    borderBottom="1px solid"
+                    borderColor="admin.border"
                     transition="all 0.15s"
-                    _hover={{ bg: "rgba(255, 255, 255, 0.03)" }}
+                    _hover={{ bg: "admin.bg" }}
                   >
                     {columns.map((col, colIdx) => (
-                      <Table.Cell key={colIdx} py={4} color="gray.200">
+                      <Table.Cell key={colIdx} py={4} color="admin.text">
                         {col.cell
                           ? col.cell(row)
                           : col.accessorKey
@@ -198,8 +196,8 @@ export function DataTable<T extends Record<string, any>>({
       </Box>
 
       {/* Footer Pagination */}
-      <Flex justify="space-between" align="center" mt={5} pt={4} borderTop="1px solid" borderColor="rgba(255, 255, 255, 0.08)">
-        <Text fontSize="xs" color="gray.400">
+      <Flex justify="space-between" align="center" mt={5} pt={4} borderTop="1px solid" borderColor="admin.border">
+        <Text fontSize="xs" color="admin.textMuted">
           Showing {paginatedData.length > 0 ? (page - 1) * pageSize + 1 : 0} to{" "}
           {Math.min(page * pageSize, sortedData.length)} of {sortedData.length} entries
         </Text>
@@ -208,25 +206,25 @@ export function DataTable<T extends Record<string, any>>({
           <Button
             size="xs"
             variant="outline"
-            borderColor="rgba(255, 255, 255, 0.15)"
-            color="gray.300"
+            borderColor="admin.border"
+            color="admin.text"
             disabled={page === 1}
             onClick={() => setPage((p) => Math.max(p - 1, 1))}
-            _hover={{ bg: "rgba(255, 255, 255, 0.08)" }}
+            _hover={{ bg: "admin.bg" }}
           >
             Previous
           </Button>
-          <Text fontSize="xs" color="gray.400" px={2}>
+          <Text fontSize="xs" color="admin.textMuted" px={2}>
             Page {page} of {totalPages}
           </Text>
           <Button
             size="xs"
             variant="outline"
-            borderColor="rgba(255, 255, 255, 0.15)"
-            color="gray.300"
+            borderColor="admin.border"
+            color="admin.text"
             disabled={page >= totalPages}
             onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-            _hover={{ bg: "rgba(255, 255, 255, 0.08)" }}
+            _hover={{ bg: "admin.bg" }}
           >
             Next
           </Button>

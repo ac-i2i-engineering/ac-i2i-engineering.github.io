@@ -1,6 +1,8 @@
 "use client";
 
 import { Box, Flex, Text, Badge } from "@chakra-ui/react";
+import type { LucideIcon } from "lucide-react";
+import { TrendingUp, CalendarClock } from "lucide-react";
 import { relativeTime } from "@/lib/utils/relativeTime";
 
 interface StatCardProps {
@@ -9,96 +11,41 @@ interface StatCardProps {
   updatedLast7Days: number;
   lastUpdatedAt: string | null;
   upcomingCount?: number;
-  icon?: string;
-  gradient?: string;
+  icon: LucideIcon;
 }
 
-export function StatCard({
-  title,
-  count,
-  updatedLast7Days,
-  lastUpdatedAt,
-  upcomingCount,
-  icon = "📊",
-  gradient = "linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%)",
-}: StatCardProps) {
+export function StatCard({ title, count, updatedLast7Days, lastUpdatedAt, upcomingCount, icon: Icon }: StatCardProps) {
   return (
-    <Box
-      className="glass-card"
-      p={6}
-      borderRadius="2xl"
-      position="relative"
-      overflow="hidden"
-    >
-      {/* Background Accent Glow */}
-      <Box
-        position="absolute"
-        top="-20px"
-        right="-20px"
-        w="100px"
-        h="100px"
-        borderRadius="full"
-        background={gradient}
-        filter="blur(30px)"
-        opacity="0.6"
-        pointerEvents="none"
-      />
-
+    <Box className="admin-card" p={6} borderRadius="2xl">
       <Flex justify="space-between" align="flex-start" mb={4}>
         <Box>
-          <Text fontSize="xs" fontWeight="bold" color="gray.400" textTransform="uppercase" letterSpacing="0.05em" mb={1}>
+          <Text fontSize="xs" fontWeight="bold" color="admin.textMuted" textTransform="uppercase" letterSpacing="0.05em" mb={1}>
             {title}
           </Text>
-          <Text fontSize="4xl" fontWeight="extrabold" color="white" letterSpacing="-0.03em">
+          <Text fontSize="4xl" fontWeight="extrabold" color="admin.text" letterSpacing="-0.03em">
             {count}
           </Text>
         </Box>
-        <Flex
-          w="48px"
-          h="48px"
-          borderRadius="xl"
-          bg="rgba(255, 255, 255, 0.06)"
-          border="1px solid rgba(255, 255, 255, 0.1)"
-          align="center"
-          justify="center"
-          fontSize="2xl"
-          boxShadow="inset 0 1px 1px rgba(255, 255, 255, 0.1)"
-        >
-          {icon}
+        <Flex w="44px" h="44px" borderRadius="xl" bg="brand.subtle" align="center" justify="center">
+          <Icon size={22} color="#D24114" strokeWidth={2} />
         </Flex>
       </Flex>
 
       <Flex align="center" gap={2} wrap="wrap" mb={4}>
-        <Badge
-          bg="rgba(99, 102, 241, 0.15)"
-          color="#A5B4FC"
-          border="1px solid rgba(99, 102, 241, 0.3)"
-          px={2.5}
-          py={1}
-          borderRadius="lg"
-          fontSize="xs"
-          fontWeight="semibold"
-        >
-          ⚡ {updatedLast7Days} updated in 7d
+        <Badge bg="#F0F7F1" color="#2F7A3C" px={2.5} py={1} borderRadius="lg" fontSize="xs" fontWeight="semibold" display="flex" alignItems="center" gap={1}>
+          <TrendingUp size={12} />
+          {updatedLast7Days} updated in 7d
         </Badge>
 
         {upcomingCount !== undefined && (
-          <Badge
-            bg="rgba(16, 185, 129, 0.15)"
-            color="#6EE7B7"
-            border="1px solid rgba(16, 185, 129, 0.3)"
-            px={2.5}
-            py={1}
-            borderRadius="lg"
-            fontSize="xs"
-            fontWeight="semibold"
-          >
-            🔥 {upcomingCount} upcoming
+          <Badge bg="info.subtle" color="info.fg" px={2.5} py={1} borderRadius="lg" fontSize="xs" fontWeight="semibold" display="flex" alignItems="center" gap={1}>
+            <CalendarClock size={12} />
+            {upcomingCount} upcoming
           </Badge>
         )}
       </Flex>
 
-      <Text fontSize="xs" color="gray.400">
+      <Text fontSize="xs" color="admin.textMuted">
         Last updated: {relativeTime(lastUpdatedAt)}
       </Text>
     </Box>
