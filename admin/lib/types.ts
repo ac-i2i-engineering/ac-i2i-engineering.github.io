@@ -75,6 +75,10 @@ export interface Media {
   attached_to_id: string | null;
   sort_order: number;
   is_published: boolean;
+  /** From the photo's own EXIF DateTimeOriginal, when present -- null for
+   *  most re-encoded/screenshot/web-sourced images. Falls back to
+   *  created_at for display when absent. */
+  captured_at: string | null;
   created_at: string;
   updated_at: string;
 }
