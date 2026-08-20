@@ -10,6 +10,10 @@ interface ImageUploaderProps {
   onChange: (url: string) => void;
   bucketName?: string;
   label?: string;
+  /** Fires with the raw File as soon as one is picked, before upload starts
+   *  -- lets a caller read client-side-only data (e.g. EXIF) that isn't
+   *  recoverable from the uploaded URL alone. */
+  onFileSelected?: (file: File) => void;
 }
 
 export function ImageUploader({
@@ -17,6 +21,7 @@ export function ImageUploader({
   onChange,
   bucketName = "media-gallery",
   label = "Upload Image",
+  onFileSelected,
 }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -25,6 +30,7 @@ export function ImageUploader({
     const files = e.target.files;
     if (!files || files.length === 0) return;
     const file = files[0];
+    onFileSelected?.(file);
     await processUpload(file);
   };
 

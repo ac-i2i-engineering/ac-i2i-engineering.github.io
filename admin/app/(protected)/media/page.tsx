@@ -7,18 +7,22 @@ import {
   Text,
   Flex,
   Button,
-  Badge,
   Image,
   Input,
   NativeSelect,
   VStack,
+  Menu,
+  Portal,
+  IconButton,
 } from "@chakra-ui/react";
-import { Upload, Link2, Pencil } from "lucide-react";
+import { Upload, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import * as exifr from "exifr";
 import { ModalFormWrapper } from "@/components/ui/ModalFormWrapper";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ImageUploader } from "@/components/ui/ImageUploader";
 import { PublishToggle } from "@/components/ui/PublishToggle";
 import { createClient } from "@/lib/supabase/client";
+import { relativeTime } from "@/lib/utils/relativeTime";
 import { Media, MediaAttachedToType } from "@/lib/types";
 
 export default function MediaPage() {
@@ -65,6 +69,7 @@ export default function MediaPage() {
       caption: "",
       attached_to_type: null,
       is_published: true,
+      captured_at: null,
     });
     setIsModalOpen(true);
   };
@@ -72,6 +77,23 @@ export default function MediaPage() {
   const openEditModal = (item: Media) => {
     setEditingMedia(item);
     setIsModalOpen(true);
+  };
+
+  // Reads the photo's own EXIF DateTimeOriginal, when present, so the card
+  // can show when it was actually taken rather than just when it was
+  // uploaded. Most re-encoded/screenshot/web-sourced images carry no EXIF
+  // at all -- that's expected, not an error, so this fails silently and
+  // just leaves captured_at unset (falls back to created_at for display).
+  const handleFileSelected = async (file: File) => {
+    try {
+      const exif = await exifr.parse(file, ["DateTimeOriginal"]);
+      const capturedAt = exif?.DateTimeOriginal as Date | undefined;
+      if (capturedAt instanceof Date && !isNaN(capturedAt.getTime())) {
+        setEditingMedia((prev) => ({ ...prev, captured_at: capturedAt.toISOString() }));
+      }
+    } catch {
+      // No EXIF data, or an unsupported format -- fine, just skip it.
+    }
   };
 
   const handleSaveMedia = async (e: React.FormEvent) => {
@@ -90,6 +112,7 @@ export default function MediaPage() {
             caption: editingMedia.caption || null,
             attached_to_type: (editingMedia.attached_to_type as MediaAttachedToType) || null,
             is_published: editingMedia.is_published ?? true,
+            captured_at: editingMedia.captured_at ?? null,
             updated_at: new Date().toISOString(),
           })
           .eq("id", editingMedia.id);
@@ -109,6 +132,7 @@ export default function MediaPage() {
           attached_to_id: null,
           sort_order: mediaList.length + 1,
           is_published: editingMedia.is_published ?? true,
+          captured_at: editingMedia.captured_at ?? null,
         };
 
         const { data, error } = await supabase.from("media").insert([newMedia]).select();
@@ -188,61 +212,57 @@ export default function MediaPage() {
                   {item.alt_text || "Untitled Media"}
                 </Text>
                 {item.caption && (
-                  <Text fontSize="xs" color="admin.textMuted" lineClamp={2} mb={3}>
+                  <Text fontSize="xs" color="admin.textMuted" mb={3}>
                     {item.caption}
                   </Text>
                 )}
 
-                <Flex align="center" gap={1.5} wrap="wrap" mb={3}>
-                  {item.attached_to_type ? (
-                    <Badge
-                      bg="#FBE9C9"
-                      color="#7A4D08"
-                      fontWeight="semibold"
-                      px={2}
-                      py={0.5}
-                      borderRadius="md"
-                      fontSize="xs"
-                      display="flex"
-                      alignItems="center"
-                      gap={1}
-                      w="fit-content"
-                    >
-                      <Link2 size={10} /> {item.attached_to_type}
-                    </Badge>
-                  ) : (
-                    <Badge bg="admin.bg" color="admin.text" fontWeight="semibold" border="1px solid" borderColor="admin.border" px={2} py={0.5} borderRadius="md" fontSize="xs">
-                      Unattached
-                    </Badge>
-                  )}
-                  <Badge
-                    bg={item.is_published ? "#E3F3E5" : "#FBE9C9"}
-                    color={item.is_published ? "#256633" : "#7A4D08"}
-                    fontWeight="semibold"
-                    px={2}
-                    py={0.5}
-                    borderRadius="md"
-                    fontSize="xs"
-                  >
-                    {item.is_published ? "Visible" : "Hidden"}
-                  </Badge>
-                </Flex>
-
                 <Flex justify="space-between" align="center" pt={3} borderTop="1px solid" borderColor="admin.border">
-                  <Button size="xs" variant="outline" borderColor="admin.border" color="admin.text" onClick={() => openEditModal(item)}>
-                    <Pencil size={12} /> Edit
-                  </Button>
-                  <Button
-                    size="xs"
-                    colorPalette="danger"
-                    variant="ghost"
-                    onClick={() => {
-                      setDeletingId(item.id);
-                      setIsDeleteOpen(true);
-                    }}
-                  >
-                    Delete
-                  </Button>
+                  <Flex align="center" gap={1.5}>
+                    <Box
+                      w="7px"
+                      h="7px"
+                      borderRadius="full"
+                      bg={item.is_published ? "#22C55E" : "#B8AC9E"}
+                      title={item.is_published ? "Visible" : "Hidden"}
+                      flexShrink={0}
+                    />
+                    <Text fontSize="xs" color="admin.textMuted">
+                      {relativeTime(item.captured_at || item.created_at)}
+                    </Text>
+                  </Flex>
+
+                  <Menu.Root>
+                    <Menu.Trigger asChild>
+                      <IconButton aria-label="More options" size="xs" variant="ghost" color="admin.textMuted" _hover={{ bg: "#F5F1EB", color: "admin.text" }}>
+                        <MoreVertical size={16} />
+                      </IconButton>
+                    </Menu.Trigger>
+                    <Portal>
+                      <Menu.Positioner>
+                        <Menu.Content bg="admin.surface" borderColor="admin.border" borderRadius="xl" boxShadow="0 12px 28px -8px rgba(26, 20, 16, 0.18)" minW="160px" py={1}>
+                          <Menu.Item value="edit" onClick={() => openEditModal(item)} color="admin.text" borderRadius="lg" _hover={{ bg: "#F5F1EB" }}>
+                            <Pencil size={14} />
+                            <Text ml={2}>Edit</Text>
+                          </Menu.Item>
+                          <Menu.Separator borderColor="admin.border" />
+                          <Menu.Item
+                            value="delete"
+                            onClick={() => {
+                              setDeletingId(item.id);
+                              setIsDeleteOpen(true);
+                            }}
+                            color="#B23610"
+                            borderRadius="lg"
+                            _hover={{ bg: "#FEF3EC" }}
+                          >
+                            <Trash2 size={14} />
+                            <Text ml={2}>Delete</Text>
+                          </Menu.Item>
+                        </Menu.Content>
+                      </Menu.Positioner>
+                    </Portal>
+                  </Menu.Root>
                 </Flex>
               </Box>
             </Box>
@@ -263,6 +283,7 @@ export default function MediaPage() {
           <ImageUploader
             value={editingMedia?.url}
             onChange={(url) => setEditingMedia((prev) => ({ ...prev, url }))}
+            onFileSelected={handleFileSelected}
             bucketName="media-gallery"
             label="Media File"
           />
